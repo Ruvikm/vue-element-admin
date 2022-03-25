@@ -1,30 +1,33 @@
 <template>
-  <div class="dashboard-container">
-    <div class="dashboard-text">收支曲线</div>
-  </div>
+  <el-select v-model="value" placeholder="请选择" @focus="getChoiceList">
+    <el-option
+      v-for="item in options"
+      :key="item.value"
+      :label="item.typeName"
+      :value="item.id"
+    >
+    </el-option>
+  </el-select>
 </template>
 
+
 <script>
-import { mapGetters } from 'vuex'
-
+import { getExChoiceListApi } from "@/api/expense";
 export default {
-  name: 'Dashboard',
-  computed: {
-    ...mapGetters([
-      'name'
-    ])
+  data() {
+    return {
+      options: [],
+      value: "",
+    };
+  },
+  methods:{
+    async getChoiceList(){
+       let res = await getExChoiceListApi(this.parms);
+      if (res && res.code == 200) {
+        console.log(res.data);
+        this.options = res.data;
+      }
+    }
   }
-}
+};
 </script>
-
-<style lang="scss" scoped>
-.dashboard {
-  &-container {
-    margin: 30px;
-  }
-  &-text {
-    font-size: 30px;
-    line-height: 46px;
-  }
-}
-</style>

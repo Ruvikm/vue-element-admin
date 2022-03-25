@@ -12,12 +12,12 @@
       </el-form-item>
       <el-form-item>
         <el-button @click="searchList" icon="el-icon-search">查询</el-button>
-        <el-button
+        <!-- <el-button
           @click="cacelList"
           style="color: #ff7670"
           icon="el-icon-delete"
           >取消</el-button
-        >
+        > -->
         <el-button
           v-if="hasPerm('sys:role:add')"
           @click="addRole"

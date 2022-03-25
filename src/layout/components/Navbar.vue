@@ -31,12 +31,12 @@
           <i class="el-icon-caret-bottom" />
         </div>
         <el-dropdown-menu slot="dropdown">
-          <el-dropdown-item divided>
+          <!-- <el-dropdown-item divided>
             <span style="display: block">个人中心</span>
-          </el-dropdown-item>
-          <el-dropdown-item divided @click.native="restore">
+          </el-dropdown-item> -->
+          <!-- <el-dropdown-item divided @click.native="restore">
             <span style="display: block">数据还原</span>
-          </el-dropdown-item>
+          </el-dropdown-item> -->
           <el-dropdown-item divided @click.native="loginOut">
             <span style="display: block">退出</span>
           </el-dropdown-item>
