@@ -1,127 +1,115 @@
 <template>
   <el-main>
-    <el-tabs v-model="activeName">
-      <el-tab-pane label="支出管理" name="first">
-        <!-- 搜索，新增按钮 -->
+    <!-- 搜索，新增按钮 -->
+    <el-form
+      :model="parms"
+      ref="seachform"
+      label-width="80px"
+      :inline="true"
+      size="small"
+    >
+      <el-form-item label="支出名称">
+        <el-input v-model="parms.name"></el-input>
+      </el-form-item>
+      <el-form-item>
+        <el-button @click="searchList" icon="el-icon-search">查询</el-button>
+        <el-button
+          v-if="hasPerm('exlist:add')"
+          @click="addExItem"
+          type="primary"
+          icon="el-icon-plus"
+          >新增</el-button
+        >
+      </el-form-item>
+    </el-form>
+    <!-- 支出表格 -->
+    <el-table :height="tableHeight" :data="ExpenseList" border stripe>
+      <el-table-column prop="outName" label="支出名"> </el-table-column>
+      <el-table-column prop="money" label="支出金额"> </el-table-column>
+      <el-table-column prop="outTypeName" label="支出类型"> </el-table-column>
+      <el-table-column prop="createTime" label="创建时间"> </el-table-column>
+      <el-table-column prop="updateTime" label="更新时间"> </el-table-column>
+      <el-table-column prop="remark" label="备注"> </el-table-column>
+      <el-table-column label="操作" align="center" width="220">
+        <template slot-scope="scope">
+          <el-button
+            v-if="hasPerm('exlist:edit')"
+            icon="el-icon-edit"
+            type="primary"
+            size="small"
+            @click="editMoney(scope.row)"
+            >编辑</el-button
+          >
+          <el-button
+            v-if="hasPerm('exlist:del')"
+            icon="el-icon-delete"
+            type="danger"
+            size="small"
+            @click="deleteMoney(scope.row)"
+            >删除</el-button
+          >
+        </template>
+      </el-table-column>
+    </el-table>
+    <!-- 分页相关 -->
+    <el-pagination
+      @size-change="sizeChange"
+      @current-change="currentChange"
+      :current-page.sync="parms.currentPage"
+      :page-sizes="[10, 20, 40, 80, 100]"
+      :page-size="parms.pageSize"
+      layout="total, sizes, prev, pager, next, jumper"
+      :total="parms.total"
+      background
+    >
+    </el-pagination>
+    <!-- 新增或编辑弹窗 -->
+    <sys-dialog
+      :title="addDialog.title"
+      :height="addDialog.height"
+      :width="addDialog.width"
+      :visible="addDialog.visible"
+      @onClose="onClose"
+      @onConfirm="onConfirm"
+    >
+      <div slot="content">
         <el-form
-          :model="parms"
-          ref="seachform"
+          :model="addExModule"
+          ref="addExForm"
+          :rules="rules"
           label-width="80px"
           :inline="true"
           size="small"
         >
-          <el-form-item label="支出名称">
-            <el-input v-model="parms.name"></el-input>
+          <el-form-item prop="outName" label="支出名称">
+            <el-input v-model="addExModule.outName"></el-input>
           </el-form-item>
-          <el-form-item>
-            <el-button @click="searchList" icon="el-icon-search"
-              >查询</el-button
+          <el-form-item prop="outTypeName" label="支出类型">
+            <!-- <el-input v-model="addExModule.outTypeName"></el-input> -->
+            <el-select
+              v-model="addExModule.outTypeName"
+              placeholder="请选择"
+              @focus="getChoiceList"
+              @change="getSelect(addExModule.outTypeName)"
             >
-            <el-button
-              v-if="hasPerm('exlist:add')"
-              @click="addExItem"
-              type="primary"
-              icon="el-icon-plus"
-              >新增</el-button
-            >
+              <el-option
+                v-for="item in options"
+                :key="item.value"
+                :label="item.typeName"
+                :value="item.typeName"
+              >
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item prop="money" label="支出金额">
+            <el-input v-model="addExModule.money"></el-input>
+          </el-form-item>
+          <el-form-item prop="remark" label="备注">
+            <el-input v-model="addExModule.remark"></el-input>
           </el-form-item>
         </el-form>
-        <!-- 支出表格 -->
-        <el-table :height="tableHeight" :data="ExpenseList" border stripe>
-          <el-table-column prop="outName" label="支出名"> </el-table-column>
-          <el-table-column prop="money" label="支出金额"> </el-table-column>
-          <el-table-column prop="outTypeName" label="支出类型">
-          </el-table-column>
-          <el-table-column prop="createTime" label="创建时间">
-          </el-table-column>
-          <el-table-column prop="updateTime" label="更新时间">
-          </el-table-column>
-          <el-table-column prop="remark" label="备注"> </el-table-column>
-          <el-table-column label="操作" align="center" width="220">
-            <template slot-scope="scope">
-              <el-button
-                v-if="hasPerm('sys:role:edit')"
-                icon="el-icon-edit"
-                type="primary"
-                size="small"
-                @click="editMoney(scope.row)"
-                >编辑</el-button
-              >
-              <el-button
-                v-if="hasPerm('sys:role:delete')"
-                icon="el-icon-delete"
-                type="danger"
-                size="small"
-                @click="deleteMoney(scope.row)"
-                >删除</el-button
-              >
-            </template>
-          </el-table-column>
-        </el-table>
-        <!-- 分页相关 -->
-        <el-pagination
-          @size-change="sizeChange"
-          @current-change="currentChange"
-          :current-page.sync="parms.currentPage"
-          :page-sizes="[10, 20, 40, 80, 100]"
-          :page-size="parms.pageSize"
-          layout="total, sizes, prev, pager, next, jumper"
-          :total="parms.total"
-          background
-        >
-        </el-pagination>
-        <!-- 新增或编辑弹窗 -->
-        <sys-dialog
-          :title="addDialog.title"
-          :height="addDialog.height"
-          :width="addDialog.width"
-          :visible="addDialog.visible"
-          @onClose="onClose"
-          @onConfirm="onConfirm"
-        >
-          <div slot="content">
-            <el-form
-              :model="addExModule"
-              ref="addExForm"
-              :rules="rules"
-              label-width="80px"
-              :inline="true"
-              size="small"
-            >
-              <el-form-item prop="outName" label="支出名称">
-                <el-input v-model="addExModule.outName"></el-input>
-              </el-form-item>
-              <el-form-item prop="outTypeName" label="支出类型">
-                <!-- <el-input v-model="addExModule.outTypeName"></el-input> -->
-                <el-select
-                  v-model="addExModule.outTypeName"
-                  placeholder="请选择"
-                  @focus="getChoiceList"
-                  @change="getSelect(addExModule.outTypeName)"
-                >
-                  <el-option
-                    v-for="item in options"
-                    :key="item.value"
-                    :label="item.typeName"
-                    :value="item.typeName"
-                  >
-                  </el-option>
-                </el-select>
-              </el-form-item>
-              <el-form-item prop="money" label="支出金额">
-                <el-input v-model="addExModule.money"></el-input>
-              </el-form-item>
-              <el-form-item prop="remark" label="备注">
-                <el-input v-model="addExModule.remark"></el-input>
-              </el-form-item>
-            </el-form>
-          </div>
-        </sys-dialog>
-      </el-tab-pane>
-      <el-tab-pane label="收入管理" name="second">
-        
-      </el-tab-pane>
-    </el-tabs>
+      </div>
+    </sys-dialog>
   </el-main>
 </template>
 
@@ -141,10 +129,9 @@ export default {
   },
   data() {
     return {
-
       // 选项tab数据
-      activeName: 'first',
-      
+      activeName: "first",
+
       // 选择支出类型数据
       options: [],
       value: "",
