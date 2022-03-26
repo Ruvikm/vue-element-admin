@@ -1,6 +1,5 @@
 <template>
   <div class="dashboard-editor-container">
-    <el-row>测试</el-row>
     <panel-group @handleSetLineChartData="handleSetLineChartData" />
 
      <el-row style="background:#fff;padding:16px 16px 0;margin-bottom:32px;">
@@ -13,7 +12,7 @@
 
 import PanelGroup from './components/PanelGroup'
 import LineChart from './components/LineChart'
-
+import {getInfo} from '@/api/user'
 
 const lineChartData = {
   newVisitis: {
@@ -43,12 +42,21 @@ export default {
   data() {
     return {
       lineChartData: lineChartData.newVisitis,
-      
+      name:""
     }
+  },
+  created(){
+    this.getUsername();
   },
   methods: {
     handleSetLineChartData(type) {
       this.lineChartData = lineChartData[type]
+    },
+    async getUsername(){
+      let res = await getInfo();
+      if (res && res.code == 200) {
+        this.username = res.data.records;
+      }
     }
   }
 }
