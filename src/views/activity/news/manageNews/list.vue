@@ -1,112 +1,140 @@
 <template>
-  <div class="app-container">
-    <el-table v-loading="listLoading" :data="list" border fit highlight-current-row style="width: 100%">
-      <el-table-column align="center" label="ID" width="80">
+  <el-main>
+    <!-- 搜索，新增按钮 -->
+    <el-form
+      :model="parms"
+      ref="seachform"
+      label-width="80px"
+      :inline="true"
+      size="small"
+    >
+      <el-form-item label="文章名称">
+        <el-input v-model="parms.name"></el-input>
+      </el-form-item>
+      <el-form-item>
+        <el-button @click="searchList" icon="el-icon-search">查询</el-button>
+        <el-button
+          v-if="hasPerm('news:add')"
+          @click="addItem"
+          type="primary"
+          icon="el-icon-plus"
+          >新增</el-button
+        >
+      </el-form-item>
+    </el-form>
+    <!-- 活动表格 -->
+    <el-table :data="ActData" stripe style="width: 100%" border>
+      <el-table-column prop="activityType" label="作者"> </el-table-column>
+      <el-table-column prop="activityName" label="文章名称"> </el-table-column>
+      <el-table-column prop="activityType" label="文章类型"> </el-table-column>
+      <el-table-column prop="activityType" label="创作时间"> </el-table-column>
+      <el-table-column label="操作" align="center" width="220">
         <template slot-scope="scope">
-          <span>{{ scope.row.id }}</span>
-        </template>
-      </el-table-column>
-
-      <el-table-column width="180px" align="center" label="Date">
-        <template slot-scope="scope">
-          <span>{{ scope.row.timestamp | parseTime('{y}-{m}-{d} {h}:{i}') }}</span>
-        </template>
-      </el-table-column>
-
-      <el-table-column width="120px" align="center" label="Author">
-        <template slot-scope="scope">
-          <span>{{ scope.row.author }}</span>
-        </template>
-      </el-table-column>
-
-      <el-table-column width="100px" label="Importance">
-        <template slot-scope="scope">
-          <svg-icon v-for="n in +scope.row.importance" :key="n" icon-class="star" class="meta-item__icon" />
-        </template>
-      </el-table-column>
-
-      <el-table-column class-name="status-col" label="Status" width="110">
-        <template slot-scope="{row}">
-          <el-tag :type="row.status | statusFilter">
-            {{ row.status }}
-          </el-tag>
-        </template>
-      </el-table-column>
-
-      <el-table-column min-width="300px" label="Title">
-        <template slot-scope="{row}">
-          <router-link :to="'/news/edit/'+row.id" class="link-type">
-            <span>{{ row.title }}</span>
-          </router-link>
-        </template>
-      </el-table-column>
-
-      <el-table-column align="center" label="Actions" width="120">
-        <template slot-scope="scope">
-          <router-link :to="'/news/edit/'+scope.row.id">
-            <el-button type="primary" size="small" icon="el-icon-edit">
-              Edit
-            </el-button>
-          </router-link>
+          <el-button
+            v-if="hasPerm('news:edit')"
+            icon="el-icon-edit"
+            type="primary"
+            size="small"
+            @click="editArticle(scope.row)"
+            >编辑</el-button
+          >
+          <el-button
+            v-if="hasPerm('news:delete')"
+            icon="el-icon-delete"
+            type="danger"
+            size="small"
+            @click="deleteArticle(scope.row)"
+            >删除</el-button
+          >
         </template>
       </el-table-column>
     </el-table>
 
-    <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
-  </div>
+    <!-- 分页相关 -->
+    <el-pagination
+      @size-change="sizeChange"
+      @current-change="currentChange"
+      :current-page.sync="parms.currentPage"
+      :page-sizes="[10, 20, 40, 80, 100]"
+      :page-size="parms.pageSize"
+      layout="total, sizes, prev, pager, next, jumper"
+      :total="parms.total"
+      background
+    >
+    </el-pagination>
+  </el-main>
 </template>
 
 <script>
-import { fetchList } from '@/api/article'
-import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
-
 export default {
-  name: 'ArticleList',
-  components: { Pagination },
-  filters: {
-    statusFilter(status) {
-      const statusMap = {
-        published: 'success',
-        draft: 'info',
-        deleted: 'danger'
-      }
-      return statusMap[status]
-    }
-  },
   data() {
     return {
-      list: null,
-      total: 0,
-      listLoading: true,
-      listQuery: {
-        page: 1,
-        limit: 20
-      }
-    }
+      seachform: [],
+
+      // 分页数据
+      parms: {
+        currentPage: 1, //当前是第几页
+        pageSize: 10, //每页查询条数
+        // userId: this.$store.getters.userId,
+        total: 0,
+        name: "",
+      },
+      ActData: [],
+      // 新增弹窗数据源
+    };
   },
   created() {
-    //this.getList()
+    // this.getData();
   },
   methods: {
-    getList() {
-      this.listLoading = true
-      fetchList(this.listQuery).then(response => {
-        this.list = response.data.items
-        this.total = response.data.total
-        this.listLoading = false
-      })
-    }
-  }
-}
+    //编辑文章
+    editArticle() {},
+    //删除文章
+    deleteArticle() {},
+
+    // 分页相关
+    currentChange(val) {
+      this.parms.currentPage = val;
+      this.getData(this.parms);
+      console.log("当前页");
+      console.log(val);
+    },
+    sizeChange(val) {
+      console.log("页容量");
+      console.log(val);
+      this.parms.currentPage = 1;
+      this.parms.pageSize = val;
+      this.getData(this.parms);
+    },
+    //获取活动列表
+    async getData() {
+      // let res = await getActListApi(this.parms);
+      // if (res && res.code == 200) {
+      //   this.ActData = res.data.records;
+      //   this.parms.total = res.data.total;
+      // }
+    },
+    searchList() {},
+    addItem() {
+      // //清空表单数据
+      // this.$resetForm("addForm", this.addModule);
+      // this.addModule.editType = "0";
+      // //设置弹框属性
+      // this.addDialog.title = "新增活动";
+      // this.addDialog.visible = true;
+    },
+  },
+};
 </script>
 
-<style scoped>
-.edit-input {
-  padding-right: 100px;
-}
-.cancel-btn {
-  position: absolute;
-  right: 15px;
-  top: 10px;
+<style lang="scss" scoped>
+.dashboard {
+  &-container {
+    margin: 30px;
+  }
+  &-text {
+    font-size: 30px;
+    line-height: 46px;
+  }
 }
 </style>

@@ -27,8 +27,10 @@
       <el-table-column prop="outName" label="支出名"> </el-table-column>
       <el-table-column prop="money" label="支出金额"> </el-table-column>
       <el-table-column prop="outTypeName" label="支出类型"> </el-table-column>
-      <el-table-column prop="createTime" label="创建时间"> </el-table-column>
-      <el-table-column prop="updateTime" label="更新时间"> </el-table-column>
+      <el-table-column prop="createTime" label="创建时间" sortable>
+      </el-table-column>
+      <el-table-column prop="updateTime" label="更新时间" sortable>
+      </el-table-column>
       <el-table-column prop="remark" label="备注"> </el-table-column>
       <el-table-column label="操作" align="center" width="220">
         <template slot-scope="scope">

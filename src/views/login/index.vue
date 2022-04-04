@@ -30,6 +30,7 @@
             <el-input
               v-model="loginForm.code"
               placeholder="请输入验证码"
+              @keyup.enter.native="handlerLogin"
             ></el-input>
           </el-col>
           <el-col :span="8" :offset="0">

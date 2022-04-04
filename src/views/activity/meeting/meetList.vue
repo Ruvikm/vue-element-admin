@@ -25,7 +25,8 @@
     <!-- 会议表格 -->
     <el-table :data="tableData" style="width: 100%" border stripe>
       <el-table-column prop="meetingName" label="会议名称"> </el-table-column>
-      <el-table-column prop="meetingTime" label="会议时间"> </el-table-column>
+      <el-table-column prop="meetingTime" label="会议时间" sortable>
+      </el-table-column>
       <el-table-column prop="meetingPlace" label="会议地点"> </el-table-column>
       <el-table-column label="操作" align="center" width="220">
         <template slot-scope="scope">
