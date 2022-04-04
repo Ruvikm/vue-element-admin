@@ -23,11 +23,11 @@
       </el-form-item>
     </el-form>
     <!-- 活动表格 -->
-    <el-table :data="ActData" stripe style="width: 100%" border>
-      <el-table-column prop="activityType" label="作者"> </el-table-column>
-      <el-table-column prop="activityName" label="文章名称"> </el-table-column>
-      <el-table-column prop="activityType" label="文章类型"> </el-table-column>
-      <el-table-column prop="activityType" label="创作时间"> </el-table-column>
+    <el-table :data="ArticleList" stripe style="width: 100%" border>
+      <el-table-column prop="author" label="作者"> </el-table-column>
+      <el-table-column prop="title" label="文章标题"> </el-table-column>
+      <el-table-column prop="type" label="文章类型"> </el-table-column>
+      <el-table-column prop="createTime" label="创作时间"> </el-table-column>
       <el-table-column label="操作" align="center" width="220">
         <template slot-scope="scope">
           <el-button
@@ -66,6 +66,7 @@
 </template>
 
 <script>
+import {getArticleListApi} from "@/api/article"
 export default {
   data() {
     return {
@@ -79,12 +80,12 @@ export default {
         total: 0,
         name: "",
       },
-      ActData: [],
+      ArticleList: [],
       // 新增弹窗数据源
     };
   },
   created() {
-    // this.getData();
+    this.getData();
   },
   methods: {
     //编辑文章
@@ -108,11 +109,11 @@ export default {
     },
     //获取活动列表
     async getData() {
-      // let res = await getActListApi(this.parms);
-      // if (res && res.code == 200) {
-      //   this.ActData = res.data.records;
-      //   this.parms.total = res.data.total;
-      // }
+      let res = await getArticleListApi(this.parms);
+      if (res && res.code == 200) {
+        this.ArticleList = res.data.records;
+        this.parms.total = res.data.total;
+      }
     },
     searchList() {},
     addItem() {
