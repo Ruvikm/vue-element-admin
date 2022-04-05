@@ -6,7 +6,7 @@
       :rules="rules"
       class="form-container"
     >
-    <!-- 导航栏 -->
+      <!-- 导航栏 -->
       <sticky :z-index="10" :class-name="'sub-navbar ' + postForm.status">
         <el-button
           v-loading="loading"
@@ -41,18 +41,18 @@
                     class="postInfo-container-item"
                   >
                     <el-select
-                      v-model="postForm.author"
-                      :remote-method="getRemoteUserList"
+                      v-model="postForm.type"
+                      :remote-method="getTypeList"
                       filterable
                       default-first-option
                       remote
                       placeholder="搜索类型"
                     >
                       <el-option
-                        v-for="(item, index) in userListOptions"
-                        :key="item + index"
-                        :label="item"
-                        :value="item"
+                        v-for="item in TypeListOptions"
+                        :key="item.value"
+                        :label="item.artype"
+                        :value="item.artype"
                       />
                     </el-select>
                   </el-form-item>
@@ -75,21 +75,44 @@ import Tinymce from "@/components/Tinymce";
 import MDinput from "@/components/MDinput";
 import Sticky from "@/components/Sticky"; // 粘性header组件
 import { validURL } from "@/utils/validate";
-import { fetchArticle } from "@/api/article";
-import { searchUser } from "@/api/remote-search";
+import { addArticleApi, getTypeListApi, fetchArticle } from "@/api/article";
+import { getInfo } from "@/api/user";
+let Base64 = {
+  encode(str) {
+    return btoa(
+      encodeURIComponent(str).replace(
+        /%([0-9A-F]{2})/g,
+        function toSolidBytes(match, p1) {
+          return String.fromCharCode("0x" + p1);
+        }
+      )
+    );
+  },
+  decode(str) {
+    return decodeURIComponent(
+      atob(str)
+        .split("")
+        .map(function (c) {
+          return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
+        })
+        .join("")
+    );
+  },
+};
 
 const defaultForm = {
+  author: "",
   status: "draft",
   title: "", // 文章题目
   content: "", // 文章内容
-  content_short: "", // 文章摘要
+  // content_short: "", // 文章摘要
   source_uri: "", // 文章外链
   image_uri: "", // 文章图片
   display_time: undefined, // 前台展示时间
   id: undefined,
-  platforms: ["a-platform"],
-  comment_disabled: false,
-  importance: 0,
+  // platforms: ["a-platform"],
+  // comment_disabled: false,
+  // importance: 0,
 };
 
 export default {
@@ -131,7 +154,7 @@ export default {
     return {
       postForm: Object.assign({}, defaultForm),
       loading: false,
-      userListOptions: [],
+      TypeListOptions: [],
       rules: {
         image_uri: [{ validator: validateRequire }],
         title: [{ validator: validateRequire }],
@@ -143,7 +166,7 @@ export default {
   },
   computed: {
     contentShortLength() {
-      return this.postForm.content_short.length;
+      // return this.postForm.content_short.length;
     },
     displayTime: {
       // set and get is useful when the data
@@ -160,34 +183,31 @@ export default {
   },
   created() {
     if (this.isEdit) {
-      const id = this.$route.params && this.$route.params.id;
-      this.fetchData(id);
+      let parms = {
+        id: this.$route.params && this.$route.params.id,
+      };
+      // const id = this.$route.params && this.$route.params.id;
+      //const articleId = this.$route.query.articleId;
+      // console.log(id);
+      this.fetchData(parms);
     }
 
     // Why need to make a copy of this.$route here?
     // Because if you enter this page and quickly switch tag, may be in the execution of the setTagsViewTitle function, this.$route is no longer pointing to the current page
     // https://github.com/PanJiaChen/vue-element-admin/issues/1221
     this.tempRoute = Object.assign({}, this.$route);
+    this.getUsername();
   },
   methods: {
-    fetchData(id) {
-      fetchArticle(id)
-        .then((response) => {
-          this.postForm = response.data;
-
-          // just for test
-          this.postForm.title += `   Article Id:${this.postForm.id}`;
-          this.postForm.content_short += `   Article Id:${this.postForm.id}`;
-
-          // set tagsview title
-          this.setTagsViewTitle();
-
-          // set page title
-          this.setPageTitle();
-        })
-        .catch((err) => {
-          console.log(err);
-        });
+    async fetchData(id) {
+      let article = await fetchArticle(id);
+      console.log(article);
+      if (article.data) {
+        this.postForm.title = article.data.title;
+        this.postForm.type = article.data.type;
+        let decoded = Base64.decode(article.data.content);
+        this.postForm.content = decoded;
+      }
     },
     setTagsViewTitle() {
       const title = "Edit Article";
@@ -202,28 +222,64 @@ export default {
     },
     submitForm() {
       console.log(this.postForm);
-      this.$refs.postForm.validate((valid) => {
+      this.$refs.postForm.validate(async (valid) => {
         if (valid) {
           this.loading = true;
-          this.$notify({
-            title: "成功",
-            message: "发布文章成功",
-            type: "success",
-            duration: 2000,
-          });
-          this.postForm.status = "published";
-          this.loading = false;
+          console.log(this.postForm.content);
+          console.log(this.postForm.author);
+          // 将富文本内容专程base64编码，这个用于上传到服务存储到数据库中
+          let encoded = Base64.encode(this.postForm.content);
+          // 将富文本的base64编码 转换成原来的格式，这个用于将数据库中的富文本展示在界面上
+          //let decoded = Base64.decode(encoded);
+          console.log(encoded);
+          //console.log(decoded);
+          this.postForm.content = encoded;
+          let res = await addArticleApi(this.postForm);
+          if (res && res.code == 200) {
+            //刷新列表
+            //this.getData(this.parms);
+            this.$message.success(res.msg);
+            this.postForm.status = "published";
+            this.loading = false;
+          }
         } else {
           console.log("error submit!!");
           return false;
         }
       });
     },
-    getRemoteUserList(query) {
-      searchUser(query).then((response) => {
-        if (!response.data.items) return;
-        this.userListOptions = response.data.items.map((v) => v.name);
-      });
+    async getTypeList(query) {
+      // searchUser(query).then((response) => {
+      //   if (!response.data.items) return;
+      //   this.TypeListOptions = response.data.items.map((v) => v.name);
+      // });
+      let res = await getTypeListApi(this.parms);
+      if (res && res.code == 200) {
+        console.log(res.data);
+        this.TypeListOptions = res.data;
+      }
+    },
+    async getUsername() {
+      let res = await getInfo();
+      if (res && res.code == 200) {
+        this.postForm.author = res.data.name;
+      }
+    },
+    // 用于上传图片的，后端需要提供好上传接口
+    handleImgUpload(blobInfo, success, failure) {
+      let formdata = new FormData();
+      formdata.set("upload_file", blobInfo.blob());
+      let new_headers = { headers: this.headers };
+      let upload_url = process.env.BASE_API + "/website/uploadfile";
+      axios
+        .post(upload_url, formdata, new_headers)
+        .then((res) => {
+          // console.log(res.data.data)
+          success(res.data.data[0]);
+        })
+        .catch((res) => {
+          failure("error");
+        });
     },
   },
 };

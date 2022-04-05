@@ -13,31 +13,40 @@
       </el-form-item>
       <el-form-item>
         <el-button @click="searchList" icon="el-icon-search">查询</el-button>
-        <el-button
-          v-if="hasPerm('news:add')"
-          @click="addItem"
-          type="primary"
-          icon="el-icon-plus"
-          >新增</el-button
-        >
+        <router-link :to="'/write/'">
+          <el-button
+            v-if="hasPerm('news:add')"
+            type="primary"
+            icon="el-icon-plus"
+            >新增</el-button
+          >
+        </router-link>
       </el-form-item>
     </el-form>
     <!-- 活动表格 -->
     <el-table :data="ArticleList" stripe style="width: 100%" border>
       <el-table-column prop="author" label="作者"> </el-table-column>
-      <el-table-column prop="title" label="文章标题"> </el-table-column>
+      <el-table-column prop="title" label="文章标题">
+        <template slot-scope="{ row }">
+          <router-link :to="'/edit/' + row.id" class="link-type">
+            <span>{{ row.title }}</span>
+          </router-link>
+        </template>
+      </el-table-column>
       <el-table-column prop="type" label="文章类型"> </el-table-column>
       <el-table-column prop="createTime" label="创作时间"> </el-table-column>
       <el-table-column label="操作" align="center" width="220">
         <template slot-scope="scope">
-          <el-button
-            v-if="hasPerm('news:edit')"
-            icon="el-icon-edit"
-            type="primary"
-            size="small"
-            @click="editArticle(scope.row)"
-            >编辑</el-button
-          >
+          <router-link :to="'/edit/' + scope.row.id">
+            <el-button
+              v-if="hasPerm('news:edit')"
+              icon="el-icon-edit"
+              type="primary"
+              size="small"
+              >编辑</el-button
+            >
+          </router-link>
+
           <el-button
             v-if="hasPerm('news:delete')"
             icon="el-icon-delete"
@@ -66,7 +75,7 @@
 </template>
 
 <script>
-import {getArticleListApi} from "@/api/article"
+import { getArticleListApi } from "@/api/article";
 export default {
   data() {
     return {
@@ -88,8 +97,6 @@ export default {
     this.getData();
   },
   methods: {
-    //编辑文章
-    editArticle() {},
     //删除文章
     deleteArticle() {},
 
@@ -116,14 +123,6 @@ export default {
       }
     },
     searchList() {},
-    addItem() {
-      // //清空表单数据
-      // this.$resetForm("addForm", this.addModule);
-      // this.addModule.editType = "0";
-      // //设置弹框属性
-      // this.addDialog.title = "新增活动";
-      // this.addDialog.visible = true;
-    },
   },
 };
 </script>
