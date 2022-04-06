@@ -13,6 +13,7 @@
           style="margin-left: 10px"
           type="success"
           @click="submitForm"
+          v-if="hasPerm('news:edit' || 'news:add')"
         >
           Publish
         </el-button>
@@ -75,7 +76,12 @@ import Tinymce from "@/components/Tinymce";
 import MDinput from "@/components/MDinput";
 import Sticky from "@/components/Sticky"; // 粘性header组件
 import { validURL } from "@/utils/validate";
-import { addArticleApi, getTypeListApi, fetchArticle } from "@/api/article";
+import {
+  addArticleApi,
+  getTypeListApi,
+  fetchArticle,
+  editArticleApi,
+} from "@/api/article";
 import { getInfo } from "@/api/user";
 let Base64 = {
   encode(str) {
@@ -186,7 +192,6 @@ export default {
       let parms = {
         id: this.$route.params && this.$route.params.id,
       };
-      // const id = this.$route.params && this.$route.params.id;
       //const articleId = this.$route.query.articleId;
       // console.log(id);
       this.fetchData(parms);
@@ -234,7 +239,12 @@ export default {
           console.log(encoded);
           //console.log(decoded);
           this.postForm.content = encoded;
-          let res = await addArticleApi(this.postForm);
+          let res = null;
+          if (!this.isEdit) res = await addArticleApi(this.postForm);
+          else {
+            this.postForm.id = this.$route.params && this.$route.params.id;
+            res = await editArticleApi(this.postForm);
+          }
           if (res && res.code == 200) {
             //刷新列表
             //this.getData(this.parms);

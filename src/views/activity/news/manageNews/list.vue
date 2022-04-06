@@ -75,7 +75,7 @@
 </template>
 
 <script>
-import { getArticleListApi } from "@/api/article";
+import { getArticleListApi, deleteArticleApi } from "@/api/article";
 export default {
   data() {
     return {
@@ -98,7 +98,21 @@ export default {
   },
   methods: {
     //删除文章
-    deleteArticle() {},
+    async deleteArticle(row) {
+      console.log(row);
+      let confirm = await this.$myconfirm("确认删除该数据吗?");
+      if (confirm) {
+        let parm = {
+          id: row.id,
+        };
+        let res = await deleteArticleApi(parm);
+        if (res && res.code == 200) {
+          this.$message.success(res.msg);
+          //新增成功刷新列表
+          this.getData();
+        }
+      }
+    },
 
     // 分页相关
     currentChange(val) {
