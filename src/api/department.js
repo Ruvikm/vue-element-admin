@@ -7,6 +7,11 @@ export async function getDeptListApi(parm){
 export async function getParentTreeApi(){
     return await http.get("/api/department/parent")
 }
+
+//获取部门名称
+export async function getDepNameApi(parm){
+    return await http.get("/api/department/getDepName",parm)
+}
 //新增部门保存
 export async function addDeptSaveApi(parm){
     return await http.post("/api/department",parm)

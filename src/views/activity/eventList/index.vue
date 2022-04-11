@@ -148,6 +148,7 @@ export default {
         // userId: this.$store.getters.userId,
         total: 0,
         name: "",
+        deptId:this.$store.getters.deptId
       },
       ActData: [],
       // 新增或编辑弹窗数据
@@ -165,7 +166,8 @@ export default {
         activityPlace: "",
         activityType: "",
         activityTime:"",
-        state:1
+        state:1,
+        deptId:this.$store.getters.deptId
       },
       // 新增弹窗验证规则
       rules: {
@@ -278,6 +280,7 @@ export default {
         if (valid) {
           let res = null;
           if (this.addModule.editType == "0") {
+            this.addModule.deptId =this.$store.getters.deptId;
             console.log(this.addModule);
             //新增
             res = await addActivityApi(this.addModule);

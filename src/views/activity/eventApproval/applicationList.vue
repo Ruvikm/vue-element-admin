@@ -136,6 +136,7 @@ export default {
         // userId: this.$store.getters.userId,
         total: 0,
         name: "",
+        deptId:this.$store.getters.deptId
       },
       ActData: [],
       // 新增或编辑弹窗数据
@@ -149,6 +150,7 @@ export default {
       addModule: {
         id: "", //编辑时候使用
         state: "",
+        deptId:""
       },
       // 新增弹窗验证规则
       rules: {
@@ -289,6 +291,7 @@ export default {
     async Rejection(row) {
       this.addModule.id = row.id;
       this.addModule.state = 2;
+      this.addModule.deptId =this.$store.getters.deptId;
       let res = await editActivityApi(this.addModule);
       if (res && res.code == 200) {
         //刷新列表

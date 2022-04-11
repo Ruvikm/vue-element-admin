@@ -82,7 +82,7 @@ import {
   fetchArticle,
   editArticleApi,
 } from "@/api/article";
-import { getInfo } from "@/api/user";
+// import { getInfo } from "@/api/user";
 let Base64 = {
   encode(str) {
     return btoa(
@@ -116,6 +116,7 @@ const defaultForm = {
   image_uri: "", // 文章图片
   display_time: undefined, // 前台展示时间
   id: undefined,
+  deptId:""
   // platforms: ["a-platform"],
   // comment_disabled: false,
   // importance: 0,
@@ -201,7 +202,9 @@ export default {
     // Because if you enter this page and quickly switch tag, may be in the execution of the setTagsViewTitle function, this.$route is no longer pointing to the current page
     // https://github.com/PanJiaChen/vue-element-admin/issues/1221
     this.tempRoute = Object.assign({}, this.$route);
-    this.getUsername();
+    this.postForm.author = this.$store.getters.name;
+    this.postForm.deptId = this.$store.getters.deptId;
+    //this.getUsername();
   },
   methods: {
     async fetchData(id) {
@@ -269,12 +272,12 @@ export default {
         this.TypeListOptions = res.data;
       }
     },
-    async getUsername() {
-      let res = await getInfo();
-      if (res && res.code == 200) {
-        this.postForm.author = res.data.name;
-      }
-    },
+    // async getUsername() {
+    //   let res = await getInfo();
+    //   if (res && res.code == 200) {
+    //     this.postForm.author = res.data.name;
+    //   }
+    // },
     // 用于上传图片的，后端需要提供好上传接口
     handleImgUpload(blobInfo, success, failure) {
       let formdata = new FormData();

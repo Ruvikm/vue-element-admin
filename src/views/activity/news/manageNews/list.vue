@@ -88,6 +88,7 @@ export default {
         // userId: this.$store.getters.userId,
         total: 0,
         name: "",
+        deptId: this.$store.getters.deptId
       },
       ArticleList: [],
       // 新增弹窗数据源

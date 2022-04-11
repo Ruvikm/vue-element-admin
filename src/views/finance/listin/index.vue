@@ -104,7 +104,7 @@
             </el-select>
           </el-form-item>
           <el-form-item prop="money" label="收入金额">
-            <el-input v-model="addExModule.money"></el-input>
+            <el-input-number v-model="addExModule.money"></el-input-number>
           </el-form-item>
           <el-form-item prop="remark" label="备注">
             <el-input v-model="addExModule.remark"></el-input>
@@ -147,6 +147,7 @@ export default {
         // userId: this.$store.getters.userId,
         total: 0,
         name: "",
+        deptId:this.$store.getters.deptId
       },
       // 新增或编辑弹窗数据
       addDialog: {
@@ -167,6 +168,7 @@ export default {
         //createTime: "",
         //updateTime: "",
         remark: "",
+        deptId:""
       },
       // 新增弹窗验证规则
       rules: {
@@ -285,6 +287,7 @@ export default {
         if (valid) {
           let res = null;
           if (this.addExModule.editType == "0") {
+            this.addExModule.deptId = this.$store.getters.deptId;
             console.log(this.addExModule);
             //新增
             res = await addInListApi(this.addExModule);

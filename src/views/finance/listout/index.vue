@@ -104,7 +104,7 @@
             </el-select>
           </el-form-item>
           <el-form-item prop="money" label="支出金额">
-            <el-input v-model="addExModule.money"></el-input>
+            <el-input-number v-model="addExModule.money"></el-input-number>
           </el-form-item>
           <el-form-item prop="remark" label="备注">
             <el-input v-model="addExModule.remark"></el-input>
@@ -118,6 +118,7 @@
 <script>
 import { mapGetters } from "vuex";
 import SysDialog from "@/components/system/SysDialog";
+import {checkNumber} from "@/utils/validate"
 import {
   getExListApi,
   addExListApi,
@@ -148,6 +149,7 @@ export default {
         // userId: this.$store.getters.userId,
         total: 0,
         name: "",
+        deptId: this.$store.getters.deptId,
       },
       // 新增或编辑弹窗数据
       addDialog: {
@@ -168,6 +170,7 @@ export default {
         //createTime: "",
         //updateTime: "",
         remark: "",
+        deptId: "",
       },
       // 新增弹窗验证规则
       rules: {
@@ -191,6 +194,11 @@ export default {
             trigger: "change",
             message: "请填写支出金额",
           },
+          // {
+          //   validator: checkNumber,
+          //   message: "金额必须为数字",
+          //   trigger: "blur",
+          // },
         ],
       },
     };
@@ -286,6 +294,7 @@ export default {
         if (valid) {
           let res = null;
           if (this.addExModule.editType == "0") {
+            this.addExModule.deptId = this.$store.getters.deptId;
             console.log(this.addExModule);
             //新增
             res = await addExListApi(this.addExModule);

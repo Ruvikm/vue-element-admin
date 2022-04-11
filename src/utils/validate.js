@@ -85,3 +85,28 @@ export function isArray(arg) {
   }
   return Array.isArray(arg)
 }
+
+/**
+ * @param {string} str
+ * @returns {Boolean}
+ */
+
+/**数字验证 */
+export function checkNumber(str) {
+  if (str == '' || str == undefined || str == null) {
+      return false;
+  } else if (!Number(str)) {
+    return false;
+  } else {
+    return true;
+  }
+}
+
+/**验证是否大于0的整数 */
+export const checkIntNum = (rule, value, callback) => {
+  if (Number.isInteger(Number(value)) && Number(value) > 0) {
+      callback()
+  } else {
+      callback(new Error('请输入大于0的整数'))
+  }
+}

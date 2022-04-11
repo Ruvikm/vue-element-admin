@@ -75,7 +75,7 @@
 
       <el-table :height="tableHeight" :data="userTableData" border stripe>
         <el-table-column prop="loginName" label="用户名"></el-table-column>
-        <el-table-column prop="deptName" label="所属部门"></el-table-column>
+        <el-table-column prop="deptName" label="所属社团"></el-table-column>
         <el-table-column prop="mobile" label="电话"></el-table-column>
         <el-table-column prop="email" label="邮箱"></el-table-column>
         <el-table-column align="center" width="290" label="操作">
@@ -89,7 +89,7 @@
               >编辑</el-button
             >
             <el-button
-              v-if="hasPerm('sys:user:assign')"
+              v-if="hasPerm('sys:user:assign') && userTableData.loginName !=username"
               icon="el-icon-setting"
               type="primary"
               size="small"
@@ -258,7 +258,7 @@
 </template>
 
 <script>
-import { getDeptListApi } from "@/api/department";
+import { getDeptListApi, getDepNameApi } from "@/api/department";
 import {
   getUserListApi,
   addUserApi,
@@ -276,10 +276,17 @@ export default {
   },
   data() {
     return {
+
+      //用户名
+      username:this.$store.getters.name,
+      //社团名称
+      deptName: "",
+      //是否是管理员
+      isAdmin: this.$store.getters.isAdmin,
       //被分配用户的id
       selectUserId: "",
       //角色列表高度
-      assignWidth: 0,
+      assignWidth: 500,
       //被选中的角色id
       selectRoleId: "",
       assginRoleList: [],
@@ -398,6 +405,7 @@ export default {
         deptId: "",
         currentPage: 1,
         pageSize: 10,
+        searchName: "",
       },
       //container高度
       containerHeight: 0,
@@ -417,9 +425,12 @@ export default {
     this.$nextTick(() => {
       this.containerHeight = window.innerHeight - 85;
       this.tableHeight = window.innerHeight - 220;
-      this.assignWidth = window.innerHeight - 630;
+      // this.assignWidth = window.innerHeight - 630;
     });
   },
+  // computed() {
+  //   // this.assignWidth = window.innerHeight - 630;
+  // },
   methods: {
     //页容量改变的时候触发
     assignsizeChange(val) {
@@ -449,6 +460,7 @@ export default {
       //获取当前被分配用户的角色id
       let parms = {
         userId: row.id,
+        deptId:this.$store.getters.deptId
       };
       let resIds = await getRoleIdByUserIdApi(parms);
       console.log(resIds);
@@ -483,6 +495,7 @@ export default {
       let parm = {
         roleId: this.selectRoleId,
         userId: this.selectUserId,
+        deptId:this.$store.getters.deptId
       };
       let res = await assignRoleSaveApi(parm);
       if (res && res.code == 200) {
@@ -514,7 +527,10 @@ export default {
     //选择上级部门
     async selectDept() {
       //查询上级部门数据
-      let res = await getDeptListApi();
+      let parms = {
+        deptName: this.deptName,
+      };
+      let res = await getDeptListApi(parms);
       if (res && res.code == 200) {
         this.parentList = res.data;
       }
@@ -618,7 +634,23 @@ export default {
     },
     //获取左侧部门树数据
     async getDeptList() {
-      let res = await getDeptListApi();
+      let deptName = null;
+      if (this.isAdmin != "1") {
+        let parms = {
+          deptId: this.$store.getters.deptId,
+        };
+        console.log(parms);
+        let res = await getDepNameApi(parms);
+        console.log(res);
+        if (res && res.code == 200) {
+          this.deptName = deptName = res.data;
+        }
+      }
+      let parms = {
+        deptName: deptName,
+      };
+      //console.log(deptName);
+      let res = await getDeptListApi(parms);
       console.log(res);
       if (res && res.code == 200) {
         this.deptList = res.data;
@@ -629,6 +661,7 @@ export default {
         });
       }
     },
+    //判断是否为管理员
   },
 };
 </script>

@@ -34,10 +34,6 @@
 </template>
 
 <script>
-// import { getToken } from 'api/qiniu'
-import { getToken } from "@/utils/auth"; // get token from cookie
-import { uploadPicApi } from "@/api/article";
-
 export default {
   name: "EditorSlideUpload",
   props: {
@@ -52,12 +48,12 @@ export default {
       listObj: {},
       fileList: [],
       headers: {
-        token: getToken() ? getToken() : "",
+        token: this.$store.getters.token
       },
     };
   },
   created() {
-    console.log(this.token);
+    
   },
   methods: {
     checkAllSuccess() {

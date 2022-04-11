@@ -127,6 +127,7 @@ export default {
         // userId: this.$store.getters.userId,
         total: 0,
         name: "",
+        deptId:this.$store.getters.deptId
       },
       // 新增或编辑弹窗数据
       addDialog: {
@@ -142,6 +143,7 @@ export default {
         meetingName: "",
         meetingPlace: "",
         meetingTime: "",
+        deptId:""
       },
       // 新增弹窗验证规则
       rules: {
@@ -209,6 +211,7 @@ export default {
         if (valid) {
           let res = null;
           if (this.addModule.editType == "0") {
+            this.addModule.deptId =this.$store.getters.deptId;
             console.log(this.addModule);
             //新增
             res = await addMeetingApi(this.addModule);
