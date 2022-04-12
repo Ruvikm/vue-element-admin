@@ -1,15 +1,15 @@
 <template>
   <el-main>
     <el-form :model="parms" ref="deptForm" :inline="true" size="small">
-      <el-form-item label="">
+      <!-- <el-form-item label="">
         <el-input
           v-model="parms.searchName"
           placeholder="请输入部门名称"
         ></el-input>
-      </el-form-item>
+      </el-form-item> -->
       <el-form-item>
-        <el-button icon="el-icon-search">查询</el-button>
-        <el-button icon="el-icon-close">重置</el-button>
+        <!-- <el-button icon="el-icon-search">查询</el-button>
+        <el-button icon="el-icon-close">重置</el-button> -->
         <el-button
           v-if="hasPerm('sys:addDepartment')"
           @click="addDept"
@@ -150,6 +150,7 @@ import {
   addDeptSaveApi,
   deleteDeptApi,
   editDeptSaveApi,
+  getDepNameApi,
 } from "@/api/department";
 import SysDialog from "@/components/system/SysDialog";
 export default {
@@ -159,6 +160,13 @@ export default {
   },
   data() {
     return {
+
+      //社团名称
+      deptName:"",
+
+      //是否是管理员
+      isAdmin: this.$store.getters.isAdmin,
+
       //树的children属性绑定
       defaultProps: {
         children: "children",
@@ -236,7 +244,10 @@ export default {
       this.parentDialog.title = "选择上级部门";
       this.parentDialog.visible = true;
       //获取上级部门树数据
-      let res = await getParentTreeApi();
+      let parms = {
+        deptName: this.deptName,
+      };
+      let res = await getDeptListApi(parms);
       if (res && res.code == 200) {
         this.treeList = res.data;
       }
@@ -284,7 +295,23 @@ export default {
     },
     //获取部门列表
     async getDeptList() {
-      let res = await getDeptListApi(this.parms);
+      let deptName = null;
+      if (this.isAdmin != "1") {
+        let parms = {
+          deptId: this.$store.getters.deptId,
+        };
+        //console.log(parms);
+        let res = await getDepNameApi(parms);
+        //console.log(res);
+        if (res && res.code == 200) {
+          this.deptName = deptName = res.data;
+        }
+      }
+      let parms = {
+        deptName: deptName,
+      };
+
+      let res = await getDeptListApi(parms);
       if (res && res.code == 200) {
         this.tableList = res.data;
       }

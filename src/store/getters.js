@@ -14,5 +14,6 @@ const getters = {
   errorLogs: state => state.errorLog.logs,
   deptId: state => state.user.deptId,
   isAdmin: state => state.user.isAdmin,
+  roleName: state => state.user.roleName,
 }
 export default getters

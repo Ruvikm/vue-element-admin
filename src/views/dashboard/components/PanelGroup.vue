@@ -10,6 +10,9 @@
           <div class="card-panel-text">
             {{name}}，你好！
           </div>
+           <div class="card-panel-text">
+           角色：{{roleName}}
+          </div>
         </div>
       </div>
     </el-col>
@@ -47,28 +50,20 @@
 
 <script>
 import CountTo from 'vue-count-to'
-import { getInfo } from "@/api/user";
+import { logger } from 'runjs/lib/common'
 export default {
   components: {
     CountTo
   },
   data(){
     return{
-      name: "",
+      name: this.$store.getters.name,
+      roleName: this.$store.getters.roleName
     }
-  },
-  created(){
-    this.getUsername();
   },
   methods: {
     handleSetLineChartData(type) {
       this.$emit('handleSetLineChartData', type)
-    },
-    async getUsername() {
-      let res = await getInfo();
-      if (res && res.code == 200) {
-        this.name = res.data.name;
-      }
     },
   }
 }

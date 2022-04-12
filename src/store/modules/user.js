@@ -10,7 +10,8 @@ const state = {
   roles: [],
   userId: "",
   deptId: "",
-  isAdmin: ""
+  isAdmin: "",
+  roleName:""
 };
 
 const mutations = {
@@ -37,6 +38,9 @@ const mutations = {
   },
   SET_ISADMIN: (state, isAdmin) => {
     state.isAdmin = isAdmin;
+  },
+  SET_ROLENAME: (state, roleName) => {
+    state.roleName = roleName;
   }
 };
 
@@ -85,7 +89,8 @@ const actions = {
             introduction,
             id,
             deptId,
-            isAdmin
+            isAdmin,
+            roleName
           } = data;
 
           // roles must be a non-empty array
@@ -106,6 +111,7 @@ const actions = {
           commit("SET_INTRODUCTION", introduction);
           commit("SET_DEPTID", deptId);
           commit("SET_ISADMIN", isAdmin);
+          commit("SET_ROLENAME", roleName);
           // console.log(state)
           resolve(data);
         })
