@@ -82,7 +82,6 @@ import {
   fetchArticle,
   editArticleApi,
 } from "@/api/article";
-// import { getInfo } from "@/api/user";
 let Base64 = {
   encode(str) {
     return btoa(
@@ -272,12 +271,6 @@ export default {
         this.TypeListOptions = res.data;
       }
     },
-    // async getUsername() {
-    //   let res = await getInfo();
-    //   if (res && res.code == 200) {
-    //     this.postForm.author = res.data.name;
-    //   }
-    // },
     // 用于上传图片的，后端需要提供好上传接口
     handleImgUpload(blobInfo, success, failure) {
       let formdata = new FormData();

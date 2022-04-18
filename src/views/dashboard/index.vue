@@ -10,7 +10,6 @@
 <script>
 import PanelGroup from "./components/PanelGroup";
 import LineChart from "./components/LineChart";
-// import { getInfo } from "@/api/user";
 
 const lineChartData = {
   newVisitis: {
@@ -49,12 +48,7 @@ export default {
     handleSetLineChartData(type) {
       this.lineChartData = lineChartData[type];
     },
-    // async getUsername() {
-    //   let res = await getInfo();
-    //   if (res && res.code == 200) {
-    //     this.name = res.data.name;
-    //   }
-    // },
+
   },
 };
 </script>
