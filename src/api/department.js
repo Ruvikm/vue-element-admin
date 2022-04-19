@@ -4,10 +4,9 @@ export async function getDeptListApi(parm){
     return await http.get("/api/department/list",parm)
 }
 //获取上级部门树数据
-export async function getParentTreeApi(){
-    return await http.get("/api/department/parent")
+export async function getParentTreeApi(parm){
+    return await http.get("/api/department/parent",parm)
 }
-
 //获取部门名称
 export async function getDepNameApi(parm){
     return await http.get("/api/department/getDepName",parm)

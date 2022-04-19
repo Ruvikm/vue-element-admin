@@ -77,7 +77,14 @@
               v-model="addDeptModel.parentName"
             ></el-input>
           </el-form-item>
-          <el-form-item prop="name" label="部门名称">
+          <el-form-item
+            prop="name"
+            v-if="addDeptModel.parentName == '顶级部门'"
+            label="社团名称"
+          >
+            <el-input v-model="addDeptModel.name"></el-input>
+          </el-form-item>
+          <el-form-item prop="name" v-else label="部门名称">
             <el-input v-model="addDeptModel.name"></el-input>
           </el-form-item>
           <el-form-item label="部门编码">
@@ -86,7 +93,7 @@
           <el-form-item label="部门电话">
             <el-input v-model="addDeptModel.deptPhone"></el-input>
           </el-form-item>
-          <el-form-item label="部门经理">
+          <el-form-item label="部门管理">
             <el-input v-model="addDeptModel.manager"></el-input>
           </el-form-item>
           <el-form-item label="部门地址">
@@ -94,6 +101,13 @@
           </el-form-item>
           <el-form-item label="部门序号">
             <el-input v-model="addDeptModel.orderNum"></el-input>
+          </el-form-item>
+          <el-form-item
+            label="社团介绍"
+            v-show="addDeptModel.parentName == '顶级部门'"
+            prop="introduction"
+          >
+            <el-input v-model="addDeptModel.introduction"></el-input>
           </el-form-item>
         </el-form>
       </div>
@@ -160,9 +174,8 @@ export default {
   },
   data() {
     return {
-
       //社团名称
-      deptName:"",
+      deptName: "",
 
       //是否是管理员
       isAdmin: this.$store.getters.isAdmin,
@@ -180,7 +193,38 @@ export default {
         visible: false,
       },
       //表单验证规则
-      rules: {
+      //添加社团就要添加社团介绍
+      ClubRules: {
+        parentName: [
+          {
+            required: true,
+            trigger: "change",
+            message: "请选择上级部门",
+          },
+        ],
+        name: [
+          {
+            required: true,
+            trigger: "change",
+            message: "请填写部门名称",
+          },
+        ],
+         introduction: [
+          {
+            required: true,
+            trigger: "blur",
+            message: "请填写社团介绍",
+          },
+          {
+            min: 5,
+            max: 18,
+            message: "5-18个字符",
+            trigger: "change",
+          },
+        ],
+      },
+      //添加部门介绍选填
+      DepRules: {
         parentName: [
           {
             required: true,
@@ -208,6 +252,7 @@ export default {
         name: "",
         deptCode: "",
         orderNum: "",
+        introduction: "",
       },
       //存储新增对话框属性
       addDialog: {
@@ -228,6 +273,13 @@ export default {
   created() {
     this.getDeptList();
   },
+  computed:{
+    rules(){
+      if(this.addDeptModel.parentName =='顶级部门')
+        return this.ClubRules;
+      return this.DepRules;
+    }
+  },
   methods: {
     openBtn(data) {
       data.open = !data.open;
@@ -244,10 +296,13 @@ export default {
       this.parentDialog.title = "选择上级部门";
       this.parentDialog.visible = true;
       //获取上级部门树数据
+      // console.log(this.deptName);
       let parms = {
         deptName: this.deptName,
       };
-      let res = await getDeptListApi(parms);
+      //let res = await getDeptListApi(parms);
+      console.log(parms);
+      let res = await getParentTreeApi(parms);
       if (res && res.code == 200) {
         this.treeList = res.data;
       }
@@ -295,6 +350,7 @@ export default {
     },
     //获取部门列表
     async getDeptList() {
+      //管理员的时候,deptName=null，其他人登录时deptName对应自己社团的名称
       let deptName = null;
       if (this.isAdmin != "1") {
         let parms = {
@@ -310,7 +366,7 @@ export default {
       let parms = {
         deptName: deptName,
       };
-
+      // console.log(this.deptName);
       let res = await getDeptListApi(parms);
       if (res && res.code == 200) {
         this.tableList = res.data;
