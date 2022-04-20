@@ -198,14 +198,14 @@ export default {
         parentName: [
           {
             required: true,
-            trigger: "change",
+            trigger: "blur",
             message: "请选择上级部门",
           },
         ],
         name: [
           {
             required: true,
-            trigger: "change",
+            trigger: "blur",
             message: "请填写部门名称",
           },
         ],

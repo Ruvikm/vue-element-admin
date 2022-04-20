@@ -55,3 +55,12 @@ export async function restoreApi(){
 export async function refreshTokenApi(parm){
   return await http.post("/api/sysUser/refreshToken",parm)
 }
+
+//获取待审批用户列表
+export async function getApproveListApi(parm){
+  return await http.get("/api/club/apply/list",parm)
+}
+//审批用户
+export async function editUserProveApi(parm){
+  return await http.put("/api/club/apply",parm)
+}
