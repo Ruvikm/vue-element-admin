@@ -11,6 +11,10 @@ export async function getParentTreeApi(parm){
 export async function getDepNameApi(parm){
     return await http.get("/api/department/getDepName",parm)
 }
+//获取顶级部门
+export async function getTopDepApi(parm){
+    return await http.get("/api/department/getTopDep",parm)
+}
 //新增部门保存
 export async function addDeptSaveApi(parm){
     return await http.post("/api/department",parm)

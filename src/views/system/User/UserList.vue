@@ -89,7 +89,7 @@
               >编辑</el-button
             >
             <el-button
-              v-if="hasPerm('sys:user:assign') && userTableData.loginName !=username"
+              v-if="hasPerm('sys:user:assign')"
               icon="el-icon-setting"
               type="primary"
               size="small"
@@ -258,7 +258,7 @@
 </template>
 
 <script>
-import { getDeptListApi, getDepNameApi } from "@/api/department";
+import { getDeptListApi, getDepNameApi, getTopDepApi } from "@/api/department";
 import {
   getUserListApi,
   addUserApi,
@@ -276,9 +276,10 @@ export default {
   },
   data() {
     return {
-
+      //分配时用的部门id
+      assignDeptId: "",
       //用户名
-      username:this.$store.getters.name,
+      username: this.$store.getters.name,
       //社团名称
       deptName: "",
       //是否是管理员
@@ -421,6 +422,7 @@ export default {
   created() {
     this.getDeptList();
   },
+  computed: {},
   mounted() {
     this.$nextTick(() => {
       this.containerHeight = window.innerHeight - 85;
@@ -434,13 +436,13 @@ export default {
   methods: {
     //页容量改变的时候触发
     assignsizeChange(val) {
-      console.log(val);
+      //console.log(val);
       this.roleParm.pageSize = val;
       this.assignRoleList();
     },
     //页数改变的时候触发
     assingcurrentChange(val) {
-      console.log(val);
+      //console.log(val);
       this.roleParm.currentPage = val;
       this.assignRoleList();
     },
@@ -460,10 +462,11 @@ export default {
       //获取当前被分配用户的角色id
       let parms = {
         userId: row.id,
-        deptId:this.$store.getters.deptId
+        deptId: this.assignDeptId,
+        // deptId:this.$store.getters.deptId
       };
       let resIds = await getRoleIdByUserIdApi(parms);
-      console.log(resIds);
+      //console.log(resIds);
       if (resIds.data) {
         this.selectRoleId = resIds.data.roleId;
       }
@@ -479,7 +482,7 @@ export default {
     },
     //角色选择事件
     getSlectRole(row) {
-      console.log(row);
+      //console.log(row);
       this.selectRoleId = row.id;
     },
     //分配角色弹框取消事件
@@ -492,11 +495,22 @@ export default {
         this.$message.warning("请分配角色！");
         return;
       }
+      if (
+        this.selectUserId == this.$store.getters.userId &&
+        this.$store.getters.isAdmin != 1
+      ) {
+        this.$message.warning("不能给自己分配角色！");
+        return;
+      }
       let parm = {
         roleId: this.selectRoleId,
         userId: this.selectUserId,
-        deptId:this.$store.getters.deptId
+        // deptId: this.$store.getters.deptId,
+        deptId: this.assignDeptId,
       };
+      // console.log(this.$store.getters.isAdmin);
+      // console.log(this.$store.getters.userId);
+      // console.log(parm);
       let res = await assignRoleSaveApi(parm);
       if (res && res.code == 200) {
         this.$message.success(res.msg);
@@ -510,7 +524,7 @@ export default {
     },
     //上级部门树节点点击事件
     parentClick(data) {
-      console.log(data);
+      //console.log(data);
       this.selectParentNode.id = data.id;
       this.selectParentNode.name = data.name;
     },
@@ -614,7 +628,7 @@ export default {
     async getUserList(deptId) {
       this.parms.deptId = deptId;
       let res = await getUserListApi(this.parms);
-      console.log(res.data.records);
+      //console.log(res.data.records);
       if (res && res.code == 200) {
         this.userTableData = res.data.records;
         this.total = res.data.total;
@@ -622,14 +636,23 @@ export default {
     },
     //加减号图标点击事件
     openBtn(data) {
-      console.log(data);
+      //console.log(data);
       data.open = !data.open;
       this.$refs.leftTree.store.nodesMap[data.id].expanded = !data.open;
     },
     //左侧部门树节点点击事件
-    handleNodeClick(data) {
+    async handleNodeClick(data) {
       this.deptId = data.id;
-      console.log(data);
+      let parms = {
+        deptId: data.id,
+      };
+      //console.log(parms);
+      let res = await getTopDepApi(parms);
+      //console.log(res);
+      if (res && res.code == 200) {
+        this.assignDeptId = res.data.id;
+      }
+      //console.log(data);
       this.getUserList(data.id);
     },
     //获取左侧部门树数据
@@ -639,9 +662,9 @@ export default {
         let parms = {
           deptId: this.$store.getters.deptId,
         };
-        console.log(parms);
+        //console.log(parms);
         let res = await getDepNameApi(parms);
-        console.log(res);
+        //console.log(res);
         if (res && res.code == 200) {
           this.deptName = deptName = res.data;
         }
@@ -651,7 +674,7 @@ export default {
       };
       //console.log(deptName);
       let res = await getDeptListApi(parms);
-      console.log(res);
+      //console.log(res);
       if (res && res.code == 200) {
         this.deptList = res.data;
         //树加载完成后，默认点击第一个节点
