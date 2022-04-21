@@ -43,11 +43,9 @@
                   >
                     <el-select
                       v-model="postForm.type"
-                      :remote-method="getTypeList"
-                      filterable
                       default-first-option
-                      remote
-                      placeholder="搜索类型"
+                      @focus="getTypeList"
+                      placeholder="请选择文章类别"
                     >
                       <el-option
                         v-for="item in TypeListOptions"
@@ -115,7 +113,7 @@ const defaultForm = {
   image_uri: "", // 文章图片
   display_time: undefined, // 前台展示时间
   id: undefined,
-  deptId:""
+  deptId: "",
   // platforms: ["a-platform"],
   // comment_disabled: false,
   // importance: 0,
@@ -253,6 +251,10 @@ export default {
             this.$message.success(res.msg);
             this.postForm.status = "published";
             this.loading = false;
+            //跳转到文章列表
+            this.$router.push({
+                path: "/manageNews",
+              });
           }
         } else {
           console.log("error submit!!");
