@@ -9,11 +9,11 @@
       size="small"
     >
       <el-form-item label="活动名称">
-        <el-input v-model="parms.name"></el-input>
+        <!-- <el-input v-model="parms.name"></el-input> -->
       </el-form-item>
-      <el-form-item>
+      <!-- <el-form-item>
         <el-button @click="searchList" icon="el-icon-search">查询</el-button>
-      </el-form-item>
+      </el-form-item> -->
     </el-form>
     <!-- 活动表格 -->
     <el-table
@@ -23,6 +23,7 @@
       border
       empty-text="暂无待审批活动"
     >
+      <el-table-column prop="deptName" label="社团名称"> </el-table-column>
       <el-table-column prop="activityName" label="活动名称"> </el-table-column>
       <el-table-column prop="activityType" label="活动类型"> </el-table-column>
       <el-table-column prop="activityTime" label="活动时间" sortable>
@@ -62,156 +63,29 @@
       background
     >
     </el-pagination>
-
-    <!-- 新增或编辑 -->
-    <!-- <sys-dialog
-      :title="addDialog.title"
-      :height="addDialog.height"
-      :width="addDialog.width"
-      :visible="addDialog.visible"
-      @onClose="onClose"
-      @onConfirm="onConfirm"
-    >
-      <div slot="content">
-        <el-form
-          :model="addModule"
-          ref="addForm"
-          :rules="rules"
-          label-width="80px"
-          :inline="true"
-          size="small"
-        >
-          <el-form-item prop="activityName" label="活动名称">
-            <el-input v-model="addModule.activityName"></el-input>
-          </el-form-item>
-          <el-form-item prop="activityPlace" label="活动地点">
-            <el-input v-model="addModule.activityPlace"></el-input>
-          </el-form-item>
-
-          <el-form-item label="活动类型" prop="activityType">
-            <el-radio-group v-model="addModule.activityType">
-              <el-radio label="团建类"></el-radio>
-              <el-radio label="学术交流类"></el-radio>
-              <el-radio label="公益活动类"></el-radio>
-              <el-radio label="政治觉悟类"></el-radio>
-              <el-radio label="运动比赛类"></el-radio>
-            </el-radio-group>
-          </el-form-item>
-
-          <el-form-item prop="activityTime" label="活动时间">
-            <el-date-picker
-              v-model="addModule.activityTime"
-              type="datetime"
-              placeholder="选择日期"
-              :picker-options="pickerOptions"
-              value-format="yyyy-MM-dd HH:mm:ss"
-            >
-            </el-date-picker>
-          </el-form-item>
-        </el-form>
-      </div>
-    </sys-dialog> -->
   </el-main>
 </template>
 
 <script>
-import {
-  getActProveListApi,
-  addActivityApi,
-  editActivityApi,
-} from "@/api/activity";
-import SysDialog from "@/components/system/SysDialog";
+import { getActProveListApi, editActivityApi } from "@/api/activity";
 export default {
-  components: {
-    SysDialog,
-  },
   data() {
     return {
       seachform: [],
-
       // 分页数据
       parms: {
         currentPage: 1, //当前是第几页
         pageSize: 10, //每页查询条数
         // userId: this.$store.getters.userId,
         total: 0,
-        name: "",
-        deptId:this.$store.getters.deptId
       },
       ActData: [],
       // 新增或编辑弹窗数据
-      addDialog: {
-        title: "",
-        height: 200,
-        width: 610,
-        visible: false,
-      },
       // 新增弹窗数据源
       addModule: {
         id: "", //编辑时候使用
         state: "",
-        deptId:""
-      },
-      // 新增弹窗验证规则
-      rules: {
-        activityName: [
-          {
-            required: true,
-            trigger: "change",
-            message: "请填写名称",
-          },
-        ],
-        activityPlace: [
-          {
-            required: true,
-            trigger: "change",
-            message: "请填写地点",
-          },
-        ],
-        activityTime: [
-          {
-            required: true,
-            trigger: "change",
-            message: "请选择时间",
-          },
-        ],
-        activityType: [
-          {
-            required: true,
-            trigger: "change",
-            message: "请选择类型",
-          },
-        ],
-      },
-      // 日期选择器
-      pickerOptions: {
-        disabledDate(time) {
-          return time.getTime() > Date.now();
-        },
-        shortcuts: [
-          {
-            text: "今天",
-            onClick(picker) {
-              picker.$emit("pick", new Date());
-            },
-          },
-          {
-            text: "昨天",
-            onClick(picker) {
-              const date = new Date();
-              date.setTime(date.getTime() - 3600 * 1000 * 24);
-              picker.$emit("pick", date);
-            },
-          },
-          {
-            text: "一周前",
-            onClick(picker) {
-              const date = new Date();
-              date.setTime(date.getTime() - 3600 * 1000 * 24 * 7);
-              picker.$emit("pick", date);
-            },
-          },
-        ],
+        deptId: "",
       },
     };
   },
@@ -223,12 +97,12 @@ export default {
     currentChange(val) {
       this.parms.currentPage = val;
       this.getData(this.parms);
-      console.log("当前页");
-      console.log(val);
+      //console.log("当前页");
+      //console.log(val);
     },
     sizeChange(val) {
-      console.log("页容量");
-      console.log(val);
+      //console.log("页容量");
+      //console.log(val);
       this.parms.currentPage = 1;
       this.parms.pageSize = val;
       this.getData(this.parms);
@@ -242,42 +116,6 @@ export default {
       }
     },
     searchList() {},
-    // addItem() {
-    //   //清空表单数据
-    //   this.$resetForm("addForm", this.addModule);
-    //   this.addModule.editType = "0";
-    //   //设置弹框属性
-    //   this.addDialog.title = "新增活动";
-    //   this.addDialog.visible = true;
-    // },
-    filterTag(value, row) {
-      return row.state === value;
-    },
-    // //关闭弹窗
-    // onClose() {
-    //   this.addDialog.visible = false;
-    // },
-    //关闭弹窗
-    // onConfirm() {
-    //   this.$refs.addForm.validate(async (valid) => {
-    //     if (valid) {
-    //       let res = null;
-    //       if (this.addModule.editType == "0") {
-    //         console.log(this.addModule);
-    //         //新增
-    //         res = await addActivityApi(this.addModule);
-    //       } else {
-    //         res = await editActivityApi(this.addModule);
-    //       }
-    //       if (res && res.code == 200) {
-    //         //刷新列表
-    //         this.getData(this.parms);
-    //         this.$message.success(res.msg);
-    //         this.addDialog.visible = false;
-    //       }
-    //     }
-    //   });
-    // },
     async Approval(row) {
       this.addModule.id = row.id;
       this.addModule.state = 1;
@@ -291,7 +129,6 @@ export default {
     async Rejection(row) {
       this.addModule.id = row.id;
       this.addModule.state = 2;
-      this.addModule.deptId =this.$store.getters.deptId;
       let res = await editActivityApi(this.addModule);
       if (res && res.code == 200) {
         //刷新列表
@@ -304,13 +141,4 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-// .dashboard {
-//   &-container {
-//     margin: 30px;
-//   }
-//   &-text {
-//     font-size: 30px;
-//     line-height: 46px;
-//   }
-// }
 </style>
