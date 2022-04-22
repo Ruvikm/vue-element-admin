@@ -1,5 +1,8 @@
 <template>
   <div class="logincontainer">
+    <div class="background">
+      <img :src="backimgSrc" width="100%" height="100%" alt="" />
+    </div>
     <el-form
       class="loginForm"
       :model="loginForm"
@@ -71,6 +74,7 @@ export default {
     return {
       loading: false,
       imgSrc: "",
+      backimgSrc: require("@/assets/background/login_bg.jpg"),
       //登录数据域
       loginForm: {
         username: "",
@@ -141,6 +145,13 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.background {
+  width: 100%;
+  height: 100%; /**宽高100%是为了图片铺满屏幕 */
+  z-index: -1;
+  position: fixed;
+}
+
 .logincontainer {
   height: 100%;
   display: flex;
