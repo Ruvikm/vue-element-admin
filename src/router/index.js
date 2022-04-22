@@ -83,6 +83,28 @@ export const constantRoutes = [
         meta: { title: '首页', icon: 'dashboard', affix: true }
       }
     ]
+  },
+  {
+    path: '/',
+    component: Layout,
+    redirect: '/manageNews',
+    hidden: true,
+    children: [
+      {
+        path: '/write',
+        component: () => import('@/views/activity/news/manageNews/create'),
+        name: 'write',
+        hidden: true,
+        meta: { title: '写文章', icon: 'dashboard', affix: true }
+      },
+      {
+        path: '/edit/:id',
+        component: () => import('@/views/activity/news/manageNews/edit.vue'),
+        name: 'edit',
+        hidden: true,
+        meta: { title: '编辑文章', icon: 'dashboard', affix: true }
+      }
+    ]
   }
 ]
 
