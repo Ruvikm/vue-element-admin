@@ -80,29 +80,6 @@ import {
   fetchArticle,
   editArticleApi,
 } from "@/api/article";
-let Base64 = {
-  encode(str) {
-    return btoa(
-      encodeURIComponent(str).replace(
-        /%([0-9A-F]{2})/g,
-        function toSolidBytes(match, p1) {
-          return String.fromCharCode("0x" + p1);
-        }
-      )
-    );
-  },
-  decode(str) {
-    return decodeURIComponent(
-      atob(str)
-        .split("")
-        .map(function (c) {
-          return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
-        })
-        .join("")
-    );
-  },
-};
-
 const defaultForm = {
   author: "",
   status: "draft",
@@ -158,6 +135,7 @@ export default {
     return {
       postForm: Object.assign({}, defaultForm),
       loading: false,
+      originData: "", //文本框里的原始数据
       TypeListOptions: [],
       rules: {
         image_uri: [{ validator: validateRequire }],
@@ -206,11 +184,13 @@ export default {
   methods: {
     async fetchData(id) {
       let article = await fetchArticle(id);
-      console.log(article);
+      //console.log(article);
       if (article.data) {
         this.postForm.title = article.data.title;
         this.postForm.type = article.data.type;
-        let decoded = Base64.decode(article.data.content);
+        let decoded = this.getDecode(article.data.content);
+        console.log(decoded);
+        this.originData = decoded;
         this.postForm.content = decoded;
       }
     },
@@ -226,14 +206,21 @@ export default {
       document.title = `${title} - ${this.postForm.id}`;
     },
     submitForm() {
-      console.log(this.postForm);
+      //console.log(this.postForm);
+      if (this.originData == this.postForm.content) {
+        //如果没有修改，直接跳回去
+        this.$router.push({
+          path: "/manageNews",
+        });
+        return;
+      }
       this.$refs.postForm.validate(async (valid) => {
         if (valid) {
           this.loading = true;
-          console.log(this.postForm.content);
-          console.log(this.postForm.author);
+          //console.log(this.postForm.content);
+          //console.log(this.postForm.author);
           // 将富文本内容专程base64编码，这个用于上传到服务存储到数据库中
-          let encoded = Base64.encode(this.postForm.content);
+          let encoded = this.getEncode64(this.postForm.content);
           // 将富文本的base64编码 转换成原来的格式，这个用于将数据库中的富文本展示在界面上
           //let decoded = Base64.decode(encoded);
           console.log(encoded);
@@ -253,8 +240,8 @@ export default {
             this.loading = false;
             //跳转到文章列表
             this.$router.push({
-                path: "/manageNews",
-              });
+              path: "/manageNews",
+            });
           }
         } else {
           console.log("error submit!!");
@@ -269,25 +256,31 @@ export default {
       // });
       let res = await getTypeListApi(this.parms);
       if (res && res.code == 200) {
-        console.log(res.data);
+        //console.log(res.data);
         this.TypeListOptions = res.data;
       }
     },
-    // 用于上传图片的，后端需要提供好上传接口
-    handleImgUpload(blobInfo, success, failure) {
-      let formdata = new FormData();
-      formdata.set("upload_file", blobInfo.blob());
-      let new_headers = { headers: this.headers };
-      let upload_url = process.env.BASE_API + "/website/uploadfile";
-      axios
-        .post(upload_url, formdata, new_headers)
-        .then((res) => {
-          // console.log(res.data.data)
-          success(res.data.data[0]);
-        })
-        .catch((res) => {
-          failure("error");
-        });
+    //Base64编码
+    getEncode64(str) {
+      return btoa(
+        encodeURIComponent(str).replace(
+          /%([0-9A-F]{2})/g,
+          function toSolidBytes(match, p1) {
+            return String.fromCharCode("0x" + p1);
+          }
+        )
+      );
+    },
+    //Base64解码
+    getDecode(str) {
+      return decodeURIComponent(
+        atob(str)
+          .split("")
+          .map(function (c) {
+            return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
+          })
+          .join("")
+      );
     },
   },
 };
