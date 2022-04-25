@@ -102,7 +102,15 @@
           <el-form-item prop="activityPlace" label="活动地点">
             <el-input v-model="addModule.activityPlace"></el-input>
           </el-form-item>
-  
+
+          <el-form-item prop="money" label="申请金额">
+            <el-input-number v-model="addModule.money"></el-input-number>
+          </el-form-item>
+
+          <el-form-item prop="applicant" label="申办人">
+            <el-input v-model="addModule.applicant"></el-input>
+          </el-form-item>
+
           <el-form-item label="活动类型" prop="activityType">
             <el-radio-group v-model="addModule.activityType">
               <el-radio label="团建类"></el-radio>
@@ -123,7 +131,17 @@
             >
             </el-date-picker>
           </el-form-item>
-
+          <el-form-item prop="details" label="具体内容">
+            <el-input
+              type="textarea"
+              maxlength="100"
+              show-word-limit
+              v-model="addModule.details"
+              :autosize="{ minRows: 6, maxRows: 8 }"
+              size="medium"
+              style="width: 350px"
+            ></el-input>
+          </el-form-item>
         </el-form>
       </div>
     </sys-dialog>
@@ -131,7 +149,7 @@
 </template>
 
 <script>
-import { getActListApi ,addActivityApi,editActivityApi} from "@/api/activity";
+import { getActListApi, addActivityApi, editActivityApi } from "@/api/activity";
 import SysDialog from "@/components/system/SysDialog";
 export default {
   components: {
@@ -148,13 +166,13 @@ export default {
         // userId: this.$store.getters.userId,
         total: 0,
         name: "",
-        deptId:this.$store.getters.deptId
+        deptId: this.$store.getters.deptId,
       },
       ActData: [],
       // 新增或编辑弹窗数据
       addDialog: {
         title: "",
-        height: 200,
+        height: 400,
         width: 610,
         visible: false,
       },
@@ -165,9 +183,12 @@ export default {
         activityName: "",
         activityPlace: "",
         activityType: "",
-        activityTime:"",
-        state:1,
-        deptId:this.$store.getters.deptId
+        activityTime: "",
+        state: 1,
+        deptId: this.$store.getters.deptId,
+        money: "",
+        applicant: "",
+        details:""
       },
       // 新增弹窗验证规则
       rules: {
@@ -276,11 +297,11 @@ export default {
     },
     //关闭弹窗
     onConfirm() {
-         this.$refs.addForm.validate(async (valid) => {
+      this.$refs.addForm.validate(async (valid) => {
         if (valid) {
           let res = null;
           if (this.addModule.editType == "0") {
-            this.addModule.deptId =this.$store.getters.deptId;
+            this.addModule.deptId = this.$store.getters.deptId;
             console.log(this.addModule);
             //新增
             res = await addActivityApi(this.addModule);

@@ -106,9 +106,46 @@
           <el-form-item prop="money" label="支出金额">
             <el-input-number v-model="addExModule.money"></el-input-number>
           </el-form-item>
-          <el-form-item prop="remark" label="备注">
-            <el-input v-model="addExModule.remark"></el-input>
-          </el-form-item>
+          <el-col :span="12">
+            <el-form-item prop="remark" label="备注">
+              <el-input v-model="addExModule.remark"></el-input>
+            </el-form-item>
+          </el-col>
+          <el-col :span="24">
+            <el-form-item prop="principal" label="负责人">
+              <!-- <el-select
+                v-model="addExModule.principal"
+                multiple
+                filterable
+                allow-create
+                default-first-option
+                placeholder="请选择至少两个负责人名"
+              >
+              </el-select> -->
+              <el-input
+                placeholder="请输入负责人名,用','隔开"
+                v-model="addExModule.principal"
+              ></el-input>
+            </el-form-item>
+          </el-col>
+          <el-col :span="24">
+            <el-form-item prop="activityName" label="活动(可选)">
+              <el-select
+                v-model="addExModule.activityName"
+                filterable
+                placeholder="请选择"
+                @focus="getActChoiceList"
+              >
+                <el-option
+                  v-for="item in ActOptions"
+                  :key="item.value"
+                  :label="item.activityName"
+                  :value="item.activityName"
+                >
+                </el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
         </el-form>
       </div>
     </sys-dialog>
@@ -118,7 +155,8 @@
 <script>
 import { mapGetters } from "vuex";
 import SysDialog from "@/components/system/SysDialog";
-import {checkNumber} from "@/utils/validate"
+import { checkNumber } from "@/utils/validate";
+import { getActChoiceListApi } from "@/api/activity";
 import {
   getExListApi,
   addExListApi,
@@ -132,6 +170,7 @@ export default {
   },
   data() {
     return {
+      ActOptions: [],
       // 选项tab数据
       activeName: "first",
 
@@ -154,7 +193,7 @@ export default {
       // 新增或编辑弹窗数据
       addDialog: {
         title: "",
-        height: 150,
+        height: 350,
         width: 610,
         visible: false,
       },
@@ -166,6 +205,8 @@ export default {
         outTypeName: "",
         outTypeId: "",
         money: "",
+        principal: "", //负责人
+        activityName: "",
 
         //createTime: "",
         //updateTime: "",
@@ -194,11 +235,13 @@ export default {
             trigger: "change",
             message: "请填写支出金额",
           },
-          // {
-          //   validator: checkNumber,
-          //   message: "金额必须为数字",
-          //   trigger: "blur",
-          // },
+        ],
+        principal: [
+          {
+            required: true,
+            trigger: "change",
+            message: "请填写支出负责人",
+          },
         ],
       },
     };
@@ -208,6 +251,16 @@ export default {
     this.getExList();
   },
   methods: {
+    //获取活动列表
+    async getActChoiceList() {
+      let parms = {
+        deptId: this.$store.getters.deptId,
+      };
+      let res = await getActChoiceListApi(parms);
+      if (res && res.code == 200) {
+        this.ActOptions = res.data;
+      }
+    },
     // 获取选中的值
     getSelect() {},
 

@@ -11,7 +11,8 @@ const state = {
   userId: "",
   deptId: "",
   isAdmin: "",
-  roleName:""
+  roleName:"",
+  username:"",
 };
 
 const mutations = {
@@ -23,6 +24,9 @@ const mutations = {
   },
   SET_NAME: (state, name) => {
     state.name = name;
+  },
+  SET_USERNAME: (state, username) => {
+    state.username = username;
   },
   SET_USERUID: (state, userId) => {
     state.userId = userId;
@@ -57,6 +61,7 @@ const actions = {
           const { token, expireTime } = response;
           //把后端返回的token存到vuex中
           commit("SET_TOKEN", token);
+          commit("SET_USERNAME", username);
           //把后端返回的token存到cookies里面
           setToken(token);
           //设置token过期时间
@@ -83,6 +88,7 @@ const actions = {
           }
 
           const {
+            username,
             roles,
             name,
             avatar,
@@ -106,6 +112,7 @@ const actions = {
           let userImg =
             "https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif";
           commit("SET_USERUID", id);
+          commit("SET_USERNAME", username);
           commit("SET_NAME", name);
           commit("SET_AVATAR", userImg);
           commit("SET_INTRODUCTION", introduction);

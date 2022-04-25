@@ -8,7 +8,7 @@ import qs from 'qs'
 const service = axios.create({
   baseURL: process.env.VUE_APP_BASE_API, // url = base url + request url
   // withCredentials: true, // send cookies when cross-domain requests
-  timeout: 10000 // request timeout
+  timeout: 10000000 // request timeout
 })
 //刷新token
 function reFresh() {

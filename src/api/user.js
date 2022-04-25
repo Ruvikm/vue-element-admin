@@ -8,6 +8,7 @@ export async function login(parms){
 export async function getInfo(){
   return await http.get("/api/sysUser/getInfo")
 }
+//获取用户菜单
 export async function getMenuList(){
   return await http.get("/api/sysUser/getMenuList")
 }
