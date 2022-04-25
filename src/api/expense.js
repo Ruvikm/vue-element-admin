@@ -4,6 +4,11 @@ import http from '@/utils/request'
 export async function getExListApi(parm){
     return await http.get("/api/expense/expenseList",parm)
 }
+
+//外界获取支出列表
+export async function getExpenseListApi(parm){
+    return await http.get("/api/expense/exList",parm)
+}
 //增加支出
 export async function addExListApi(parm){
     //return await http.get("/api/expense",parm)  //错误的

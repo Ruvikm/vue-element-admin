@@ -29,7 +29,7 @@
       <el-table-column prop="outTypeName" label="支出类型"> </el-table-column>
       <el-table-column prop="createTime" label="创建时间" sortable>
       </el-table-column>
-      <el-table-column prop="updateTime" label="更新时间" sortable>
+      <el-table-column prop="principal" label="负责人" sortable>
       </el-table-column>
       <el-table-column prop="remark" label="备注"> </el-table-column>
       <el-table-column label="操作" align="center" width="220">

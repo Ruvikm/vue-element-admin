@@ -24,7 +24,12 @@
     </el-form>
     <!-- 活动表格 -->
     <el-table :data="ActData" stripe style="width: 100%" border>
-      <el-table-column prop="activityName" label="活动名称"> </el-table-column>
+      <el-table-column
+        prop="activityName"
+        label="活动名称"
+        @click="Details(row)"
+      >
+      </el-table-column>
       <el-table-column prop="activityType" label="活动类型"> </el-table-column>
       <el-table-column prop="activityTime" label="活动时间" sortable>
       </el-table-column>
@@ -60,6 +65,17 @@
             v-if="scope.row.state == '2'"
             disable-transitions
             >审核失败</el-tag
+          >
+        </template>
+      </el-table-column>
+      <el-table-column label="操作" align="center" width="220">
+        <template slot-scope="scope">
+          <el-button
+            icon="el-icon-edit"
+            type="primary"
+            size="small"
+            @click="CheckDetails(scope.row)"
+            >查看详情</el-button
           >
         </template>
       </el-table-column>
@@ -145,11 +161,81 @@
         </el-form>
       </div>
     </sys-dialog>
+    <sys-dialog
+      :title="DetailsDialog.title"
+      :height="DetailsDialog.height"
+      :width="DetailsDialog.width"
+      :visible="DetailsDialog.visible"
+      @onClose="DetailsonClose"
+      @onConfirm="DetailsonConfirm"
+    >
+      <div slot="content">
+        <el-form
+          :model="addModule"
+          ref="addForm"
+          label-width="80px"
+          :inline="true"
+          size="small"
+        >
+          <el-col :span="24">
+            <el-form-item prop="activityName" label="活动名称:">
+              <span>{{ addModule.activityName }}</span>
+            </el-form-item>
+          </el-col>
+          <el-col :span="24">
+            <el-form-item prop="activityPlace" label="活动地点:">
+              <span>{{ addModule.activityPlace }}</span>
+            </el-form-item>
+          </el-col>
+          <el-col :span="24">
+            <el-form-item prop="money" label="申请金额:">
+              <span>{{ addModule.money }} ¥</span>
+            </el-form-item>
+          </el-col>
+          <el-col :span="24">
+            <el-form-item prop="applicant" label="申办人:">
+              <span>{{ addModule.applicant }}</span>
+            </el-form-item>
+          </el-col>
+          <el-col :span="24">
+            <el-form-item label="活动类型:" prop="activityType">
+              <span>{{ addModule.activityType }}</span>
+            </el-form-item>
+          </el-col>
+          <el-col :span="24">
+            <el-form-item prop="activityTime" label="活动时间:">
+              <span>{{ addModule.activityTime }}</span>
+            </el-form-item>
+          </el-col>
+          <el-col :span="24">
+            <el-form-item prop="details" label="具体内容:">
+              <span>{{ addModule.details }}</span>
+            </el-form-item>
+          </el-col>
+          <el-col :span="24">
+            <el-form-item prop="details" label="租借物品:">
+              <span>占位符</span>
+            </el-form-item>
+          </el-col>
+          <el-col :span="24">
+            <el-form-item label="财务支出:">
+              <el-table :data="ExList" stripe style="width: 100%" border >
+                <el-table-column prop="outName" label="支出名称:" align="center" width="250">
+                </el-table-column>
+                <el-table-column prop="money" label="支出金额:" align="center" width="250" >
+                </el-table-column>
+              </el-table>
+            </el-form-item>
+          </el-col>
+        </el-form>
+      </div>
+    </sys-dialog>
   </el-main>
 </template>
 
 <script>
 import { getActListApi, addActivityApi, editActivityApi } from "@/api/activity";
+import { getExpenseListApi } from "@/api/expense";
 import SysDialog from "@/components/system/SysDialog";
 export default {
   components: {
@@ -157,6 +243,7 @@ export default {
   },
   data() {
     return {
+      ExList: [],
       seachform: [],
 
       // 分页数据
@@ -176,6 +263,12 @@ export default {
         width: 610,
         visible: false,
       },
+      DetailsDialog: {
+        title: "",
+        height: 500,
+        width: 610,
+        visible: false,
+      },
       // 新增弹窗数据源
       addModule: {
         id: "", //编辑时候使用
@@ -188,8 +281,9 @@ export default {
         deptId: this.$store.getters.deptId,
         money: "",
         applicant: "",
-        details:""
+        details: "",
       },
+      DetailsModule: {},
       // 新增弹窗验证规则
       rules: {
         activityName: [
@@ -257,6 +351,34 @@ export default {
     this.getData();
   },
   methods: {
+    //详情弹窗的功能
+    DetailsonClose() {
+      this.DetailsDialog.visible = false;
+    },
+    DetailsonConfirm() {
+      this.DetailsDialog.visible = false;
+    },
+
+    //获取支出列表
+    async getExpenList(row) {
+      let parms = {
+        deptId: this.$store.getters.deptId,
+        activityId: row.id,
+      };
+      let res = await getExpenseListApi(parms);
+      console.log(res);
+      if (res && res.code == 200) {
+        this.ExList = res.data;
+      }
+    },
+    //查看细节
+    CheckDetails(row) {
+      this.$resetForm("addForm", this.addModule);
+      this.$objCoppy(row, this.addModule);
+      this.getExpenList(row);
+      this.DetailsDialog.title = "活动详情";
+      this.DetailsDialog.visible = true;
+    },
     // 分页相关
     currentChange(val) {
       this.parms.currentPage = val;

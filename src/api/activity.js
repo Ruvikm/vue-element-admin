@@ -20,7 +20,6 @@ export async function editActivityApi(parm){
 }
 
 //获取选项活动列表
-//获取活动列表
 export async function getActChoiceListApi(parm){
     return await http.get("/api/activity/ActChoiceList",parm)
 }
