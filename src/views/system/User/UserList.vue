@@ -623,6 +623,7 @@ export default {
       this.$objCoppy(row, this.addModel);
       //设置编辑状态
       this.addModel.editType = "1";
+      console.log(row);
     },
     //获取用户列表
     async getUserList(deptId) {

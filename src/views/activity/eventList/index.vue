@@ -214,15 +214,83 @@
           </el-col>
           <el-col :span="24">
             <el-form-item prop="details" label="租借物品:">
-              <span>占位符</span>
+              <el-table :data="ThingsList" stripe style="width: 100%" border>
+                <el-table-column
+                  prop="name"
+                  label="物品名称:"
+                  align="center"
+                  width="125"
+                >
+                </el-table-column>
+                <el-table-column
+                  prop="state"
+                  align="center"
+                  width="125"
+                  label="物品状态"
+                  :filters="[
+                    { text: '已归还', value: 0 },
+                    { text: '租借中', value: 1 },
+                    { text: '已逾期', value: 2 },
+                  ]"
+                  :filter-method="filterTag"
+                  filter-placement="bottom-end"
+                >
+                  <template slot-scope="scope">
+                    <el-tag
+                      size="normal"
+                      v-if="scope.row.state == '0'"
+                      disable-transitions
+                      >已归还</el-tag
+                    >
+                    <el-tag
+                      size="normal"
+                      type="success"
+                      v-if="scope.row.state == '1'"
+                      disable-transitions
+                      >租借中</el-tag
+                    >
+                    <el-tag
+                      size="normal"
+                      type="danger"
+                      v-if="scope.row.state == '2'"
+                      disable-transitions
+                      >已逾期</el-tag
+                    >
+                  </template>
+                </el-table-column>
+                <el-table-column
+                  prop="lessor"
+                  label="租借人"
+                  align="center"
+                  width="125"
+                >
+                </el-table-column>
+                <el-table-column
+                  prop="endTime"
+                  label="应归还时间"
+                  align="center"
+                  width="125"
+                >
+                </el-table-column>
+              </el-table>
             </el-form-item>
           </el-col>
           <el-col :span="24">
             <el-form-item label="财务支出:">
-              <el-table :data="ExList" stripe style="width: 100%" border >
-                <el-table-column prop="outName" label="支出名称:" align="center" width="250">
+              <el-table :data="ExList" stripe style="width: 100%" border>
+                <el-table-column
+                  prop="outName"
+                  label="支出名称:"
+                  align="center"
+                  width="250"
+                >
                 </el-table-column>
-                <el-table-column prop="money" label="支出金额:" align="center" width="250" >
+                <el-table-column
+                  prop="money"
+                  label="支出金额:"
+                  align="center"
+                  width="250"
+                >
                 </el-table-column>
               </el-table>
             </el-form-item>
@@ -237,14 +305,18 @@
 import { getActListApi, addActivityApi, editActivityApi } from "@/api/activity";
 import { getExpenseListApi } from "@/api/expense";
 import SysDialog from "@/components/system/SysDialog";
+import { getShowListApi } from "@/api/things";
 export default {
   components: {
     SysDialog,
   },
   data() {
     return {
+      //支出列表
       ExList: [],
       seachform: [],
+      //物品列表
+      ThingsList: [],
 
       // 分页数据
       parms: {
@@ -371,11 +443,24 @@ export default {
         this.ExList = res.data;
       }
     },
+    //获取物品列表
+    async getThingsList(row) {
+      let parms = {
+        deptId: this.$store.getters.deptId,
+        activityId: row.id,
+      };
+      let res = await getShowListApi(parms);
+      console.log(res);
+      if (res && res.code == 200) {
+        this.ThingsList = res.data;
+      }
+    },
     //查看细节
     CheckDetails(row) {
       this.$resetForm("addForm", this.addModule);
       this.$objCoppy(row, this.addModule);
       this.getExpenList(row);
+      this.getThingsList(row);
       this.DetailsDialog.title = "活动详情";
       this.DetailsDialog.visible = true;
     },
