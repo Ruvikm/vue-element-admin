@@ -23,3 +23,8 @@ export async function deleteInListApi(parm){
 export async function getInChoiceListApi(parm){
     return await http.get("/api/income/inChoiceList",parm)
 }
+
+//获取近一个月收入
+export async function getIncomeSumApi(parm){
+    return await http.get("/api/income/SumIncome",parm)
+}

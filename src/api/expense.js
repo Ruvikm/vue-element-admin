@@ -28,3 +28,8 @@ export async function deleteExListApi(parm){
 export async function getExChoiceListApi(parm){
     return await http.get("/api/expense/exChoiceList",parm)
 }
+
+//获取近一个月支出
+export async function getExpenseSumApi(parm){
+    return await http.get("/api/expense/SumExpense",parm)
+}

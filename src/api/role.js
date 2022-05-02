@@ -23,3 +23,8 @@ export async function getAssignTreeApi(parm){
 export async function assignSaveApi(parm){
   return await http.post("/api/role/roleAssignSave",parm)
 }
+
+//获取角色数量
+export async function getRoleNumApi(parms){
+  return await http.get("/api/role/SumRole",parms)
+}

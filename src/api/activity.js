@@ -23,3 +23,8 @@ export async function editActivityApi(parm){
 export async function getActChoiceListApi(parm){
     return await http.get("/api/activity/ActChoiceList",parm)
 }
+
+//获取待审批活动数量
+export async function getProveActNumApi(parm){
+    return await http.get("/api/activity/SumApplyAct",parm)
+}

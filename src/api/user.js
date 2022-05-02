@@ -65,3 +65,18 @@ export async function getApproveListApi(parm){
 export async function editUserProveApi(parm){
   return await http.put("/api/club/apply",parm)
 }
+
+//获取全部用户数量
+export async function getUserNumApi(parms){
+  return await http.get("/api/user/SumUser",parms)
+}
+
+//获取当前社团用户数量
+export async function getDeptUserNumApi(parms){
+  return await http.get("/api/user/SumDeptUser",parms)
+}
+
+//获取申请社团用户数量
+export async function getApplyUserNumApi(parms){
+  return await http.get("/api/club/apply/SumApplyUser",parms)
+}
