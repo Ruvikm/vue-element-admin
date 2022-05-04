@@ -74,8 +74,11 @@
           </div>
           <div class="card-panel-description">
             <div class="card-panel-text">申请人数</div>
-            <count-to :start-val="0" :end-val= peopleApplyNum :duration=
-            peopleApplyNum/2 class="card-panel-num" />
+            <count-to
+              :start-val="0"
+              :end-val="peopleApplyNum"
+              class="card-panel-num"
+            />
           </div>
         </div>
       </el-col>
