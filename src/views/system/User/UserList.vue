@@ -276,6 +276,9 @@ export default {
   },
   data() {
     return {
+
+      //角色名字
+      roleName:this.$store.getters.roleName,
       //分配时用的部门id
       assignDeptId: "",
       //用户名

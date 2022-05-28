@@ -20,28 +20,25 @@
       </el-table-column>
       <el-table-column label="操作" align="center" width="220">
         <template slot-scope="scope">
-          <el-popconfirm title="确认此成员加入社团吗？">
-            <el-button
-              slot="reference"
-              v-if="hasPerm('userApprove:edit')"
-              icon="el-icon-edit"
-              type="primary"
-              size="small"
-              @click="Approval(scope.row)"
-              >通过</el-button
-            >
-          </el-popconfirm>
-          <el-popconfirm title="确认拒绝此成员吗？">
-            <el-button
-              slot="reference"
-              v-if="hasPerm('userApprove:edit')"
-              icon="el-icon-delete"
-              type="danger"
-              size="small"
-              @click="Rejection(scope.row)"
-              >拒绝</el-button
-            >
-          </el-popconfirm>
+          <el-button
+            slot="reference"
+            v-if="hasPerm('userApprove:edit')"
+            icon="el-icon-edit"
+            type="primary"
+            size="small"
+            @click="Approval(scope.row)"
+            >通过</el-button
+          >
+
+          <el-button
+            slot="reference"
+            v-if="hasPerm('userApprove:edit')"
+            icon="el-icon-delete"
+            type="danger"
+            size="small"
+            @click="Rejection(scope.row)"
+            >拒绝</el-button
+          >
         </template>
       </el-table-column>
     </el-table>
@@ -126,25 +123,31 @@ export default {
     },
     async Approval(row) {
       // console.log("通过");
-      this.$objCoppy(row, this.ApplyModule);
-      this.ApplyModule.id = row.id;
-      this.ApplyModule.state = 1;
-      let res = await editUserProveApi(this.ApplyModule);
-      if (res && res.code == 200) {
-        //刷新列表
-        this.getData(this.parms);
-        this.$message.success(res.msg);
+      let confirm = await this.$myconfirm("确认该用户加入社团？");
+      if (confirm) {
+        this.$objCoppy(row, this.ApplyModule);
+        this.ApplyModule.id = row.id;
+        this.ApplyModule.state = 1;
+        let res = await editUserProveApi(this.ApplyModule);
+        if (res && res.code == 200) {
+          //刷新列表
+          this.getData(this.parms);
+          this.$message.success(res.msg);
+        }
       }
     },
     async Rejection(row) {
-      this.$objCoppy(row, this.ApplyModule);
-      this.ApplyModule.id = row.id;
-      this.ApplyModule.state = 2;
-      let res = await editUserProveApi(this.ApplyModule);
-      if (res && res.code == 200) {
-        //刷新列表
-        this.getData(this.parms);
-        this.$message.success(res.msg);
+      let confirm = await this.$myconfirm("拒绝该用户加入社团？");
+      if (confirm) {
+        this.$objCoppy(row, this.ApplyModule);
+        this.ApplyModule.id = row.id;
+        this.ApplyModule.state = 2;
+        let res = await editUserProveApi(this.ApplyModule);
+        if (res && res.code == 200) {
+          //刷新列表
+          this.getData(this.parms);
+          this.$message.success(res.msg);
+        }
       }
     },
   },
