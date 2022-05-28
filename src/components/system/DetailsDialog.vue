@@ -10,7 +10,8 @@
       <slot name="content"></slot>
     </div>
     <span slot="footer" class="dialog-footer">
-      <el-button type="danger" @click="onClose()">拒 绝</el-button>
+      <!-- <el-button type="danger" @click="onClose()">取 消</el-button> -->
+      <el-button type="danger" @click="onReject()">拒 绝</el-button>
       <el-button type="primary" @click="onConfirm()">通 过</el-button>
     </span>
   </el-dialog>
@@ -37,14 +38,18 @@ export default {
     },
   },
   methods: {
-    //关闭事件
-    onClose() {
-      this.$emit("onClose");
+    //拒绝事件
+    onReject() {
+      this.$emit("onReject");
     },
     //确认事件
     onConfirm() {
       this.$emit("onConfirm");
     },
+    //关闭事件
+    onClose(){
+       this.$emit("onClose");
+    }
   },
 };
 </script>

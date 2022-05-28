@@ -68,14 +68,23 @@
           >
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center" width="220">
+      <el-table-column label="操作" align="center" width="300">
         <template slot-scope="scope">
           <el-button
             icon="el-icon-edit"
             type="primary"
             size="small"
             @click="CheckDetails(scope.row)"
-            >查看详情</el-button
+            >详情</el-button
+          >
+          <el-button
+            v-if="hasPerm('activity:edit')"
+            v-show="scope.row.state == 2"
+            icon="el-icon-delete"
+            type="danger"
+            size="small"
+            @click="ReApply(scope.row)"
+            >再次申请</el-button
           >
         </template>
       </el-table-column>
@@ -423,6 +432,20 @@ export default {
     this.getData();
   },
   methods: {
+    //再次申请
+    ReApply(row) {
+      //清空表单
+      this.$resetForm("addForm", this.addModule);
+      //设置弹框属性
+      this.addDialog.title = "编辑活动";
+      this.addDialog.visible = true;
+      //标识 编辑
+      this.addModule.editType = "1";
+      //把当前点击的行数据复制到表单数据域
+      this.$objCoppy(row, this.addModule);
+      this.addModule.state = 0;
+      console.log(row);
+    },
     //详情弹窗的功能
     DetailsonClose() {
       this.DetailsDialog.visible = false;

@@ -47,15 +47,16 @@
             type="primary"
             size="small"
             @click="CheckDetails(scope.row)"
-            >查看详情</el-button
+            >详情</el-button
           >
           <!-- <el-button
             v-if="hasPerm('activity:edit')"
+            v-show="scope.row.state==2"
             icon="el-icon-delete"
             type="danger"
             size="small"
             @click="Rejection(scope.row)"
-            >拒绝</el-button
+            >再次申请</el-button
           > -->
         </template>
       </el-table-column>
@@ -66,8 +67,9 @@
       :height="addDialog.height"
       :width="addDialog.width"
       :visible="addDialog.visible"
-      @onClose="onClose"
+      @onReject="onReject"
       @onConfirm="onConfirm"
+      @onClose="onClose"
     >
       <div slot="content">
         <el-form
@@ -176,8 +178,12 @@ export default {
     this.getData();
   },
   methods: {
-    //弹窗的确认取消事件
-    async onClose() {
+    //弹窗关闭事件
+    onClose(){
+      this.addDialog.visible = false;
+    },
+    //弹窗的拒绝事件
+    async onReject() {
       this.addModule.state = 2;
       let res = await editActivityApi(this.addModule);
       if (res && res.code == 200) {
