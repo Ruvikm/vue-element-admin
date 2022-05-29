@@ -61,8 +61,11 @@
           </div>
           <div class="card-panel-description">
             <div class="card-panel-text">社团人数</div>
-            <count-to :start-val="0" :end-val= userNum :duration= userNum/2
-            class="card-panel-num" />
+            <count-to
+              :start-val="userNum"
+              :end-val="userNum"
+              class="card-panel-num"
+            />
           </div>
         </div>
       </el-col>

@@ -61,19 +61,84 @@
 </template>
 
 <script>
+import { getCreateDeptListApi, PassApplyApi } from "@/api/department";
 export default {
   data() {
     return {
-      ApplyData:[]
+      ApplyData: [],
+      // 分页数据
+      parms: {
+        currentPage: 1, //当前是第几页
+        pageSize: 10, //每页查询条数
+        // userId: this.$store.getters.userId,
+        total: 0,
+      },
+      ApplyData: [],
+      ApplyModule: {
+        id:"",
+        username: "",
+        introduction: "",
+        deptName: "",
+        state: "",
+        deptCode: "",
+        deptAddress: "",
+        deptPhone:"",
+        applyTime:""
+      },
     };
   },
+  created() {
+    this.getApplyList();
+  },
   methods: {
-    Approval(){
-
+    // 分页相关
+    currentChange(val) {
+      this.parms.currentPage = val;
+      this.getApplyList(this.parms);
+      console.log("当前页");
+      console.log(val);
     },
-    Rejection(){
-      
-    }
+    sizeChange(val) {
+      console.log("页容量");
+      console.log(val);
+      this.parms.currentPage = 1;
+      this.parms.pageSize = val;
+      this.getApplyList(this.parms);
+    },
+    async Approval(row) {
+      let confirm = await this.$myconfirm("确认该用户创建社团？");
+      if (confirm) {
+        this.$objCoppy(row, this.ApplyModule);
+        this.ApplyModule.id = row.id;
+        this.ApplyModule.state = 1;
+        let res = await PassApplyApi(this.ApplyModule);
+        if (res && res.code == 200) {
+          //刷新列表
+          this.getApplyList(this.parms);
+          this.$message.success(res.msg);
+        }
+      }
+    },
+    async Rejection(row) {
+      let confirm = await this.$myconfirm("拒绝该用户创建社团？");
+      if (confirm) {
+        this.$objCoppy(row, this.ApplyModule);
+        this.ApplyModule.id = row.id;
+        this.ApplyModule.state = 2;
+        let res = await PassApplyApi(this.ApplyModule);
+        if (res && res.code == 200) {
+          //刷新列表
+          this.getApplyList(this.parms);
+          this.$message.success(res.msg);
+        }
+      }
+    },
+    async getApplyList() {
+      let res = await getCreateDeptListApi(this.parms);
+      if (res && res.code == 200) {
+        this.ApplyData = res.data.records;
+      }
+    },
   },
   components: {},
 };

@@ -77,7 +77,7 @@
         <el-table-column prop="loginName" label="用户名"></el-table-column>
         <el-table-column prop="deptName" label="所属社团"></el-table-column>
         <el-table-column prop="mobile" label="电话"></el-table-column>
-        <el-table-column prop="email" label="邮箱"></el-table-column>
+        <!-- <el-table-column prop="email" label="邮箱"></el-table-column> -->
         <el-table-column align="center" width="290" label="操作">
           <template slot-scope="scope">
             <el-button
@@ -152,9 +152,9 @@
           <el-form-item label="昵称">
             <el-input v-model="addModel.nickName"></el-input>
           </el-form-item>
-          <el-form-item label="邮箱">
+          <!-- <el-form-item label="邮箱">
             <el-input v-model="addModel.email"></el-input>
-          </el-form-item>
+          </el-form-item> -->
           <el-form-item prop="username" label="登录名">
             <el-input v-model="addModel.username"></el-input>
           </el-form-item>
