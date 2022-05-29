@@ -94,7 +94,7 @@
       <el-table-column label="操作" align="center" width="320">
         <template slot-scope="scope">
           <el-button
-           v-if="scope.row.state != '0'"
+            v-if="scope.row.state != '0'"
             icon="el-icon-edit"
             type="primary"
             size="small"
@@ -391,6 +391,10 @@ export default {
             newList[item].LastTime = 0;
             newList[item].state = "2";
           }
+          if (LastTime > 0 && newList[item].state =="2") {
+            newList[item].LastTime = LastTime;
+            newList[item].state = "1";
+          }
         }
         this.ThingsList = newList;
       }
@@ -440,6 +444,10 @@ export default {
             //新增
             res = await addThingsApi(this.addModule);
           } else {
+            if (this.addModule.LastTime > 0 && this.addModule.state == 2) {
+              console.log("进去啦");
+              this.addModule.state = 1;
+            }
             res = await editThingsApi(this.addModule);
           }
           if (res && res.code == 200) {
