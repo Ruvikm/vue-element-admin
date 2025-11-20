@@ -167,5 +167,3 @@ npm run preview
 该项目基于 `PanJiaChen/vue-element-admin`，在此感谢原作者及社区贡献者的工作。
 
 ---
-
-如果你希望我把 README 翻译成英文、补充截图、增加部署示例（例如 Docker/Nginx 配置）或根据你的后端配置调整示例，请告诉我。 
